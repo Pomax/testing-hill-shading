@@ -14,6 +14,8 @@ const reflect = (ray, normal) => {
   return sub(muls(normal, 2 * dot(ray, normal)), ray);
 };
 
+const lerp = (r,a,b) => (1-r)*a + r*b;
+
 const map = (v, ds, de, ts, te) => {
   const d = de - ds;
   if (d === 0) return ts;
@@ -25,7 +27,7 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
-const w = 500;
+const w = 1200;
 const h = w;
 cvs.width = cvs.height = w;
 const ctx = cvs.getContext(`2d`);
@@ -49,11 +51,13 @@ function hillShade(evt) {
   const { width, height } = cvs.getBoundingClientRect();
   const w2 = width / 2;
   const h2 = height / 2;
-  let x = (100 * (evt.offsetX - w2)) / w2;
-  let y = (100 * (evt.offsetY - h2)) / h2;
+  let x = -(100 * (evt.offsetX - w2)) / w2;
+  let y = -(100 * (evt.offsetY - h2)) / h2;
   const light = { x: -x, y: -y, z: 1 };
 
   let max = 0;
+  const blend = (a,b) => lerp(0.9, a, b);
+  const F = v => constrain(map(v,0,1,0,255),0,255);
 
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
@@ -68,12 +72,12 @@ function hillShade(evt) {
       // compute illumination
       const reflection = unit(reflect(light, n));
       const z = reflection.z ** 0.25;
-      const e = constrain(map(z, 0, 1, 0, 255), 0, 255);
+      const e = F(z);
 
       // noise reduction using the alpha channel
-      shaded.data[i + 0] = e;
-      shaded.data[i + 1] = e;
-      shaded.data[i + 2] = e;
+      shaded.data[i + 0] = blend(F(n.x), e);
+      shaded.data[i + 1] = blend(F(n.y), e);
+      shaded.data[i + 2] = blend(F(n.z), e);
       shaded.data[i + 3] = 255;
     }
   }
