@@ -27,7 +27,7 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
-const w = 1200;
+const w = 800;
 const h = w;
 cvs.width = cvs.height = w;
 const ctx = cvs.getContext(`2d`);
@@ -38,6 +38,7 @@ im.src = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC
 // hill shader
 function hillShade(evt) {
   ctx.drawImage(im, 0, 0, w, h);
+  if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
   const pixels = imageData.data;
   const shaded = ctx.createImageData(w, h);
@@ -86,4 +87,5 @@ function hillShade(evt) {
 }
 
 cvs.addEventListener(`mousemove`, hillShade);
-hillShade({ offsetX: 0, offsetY: 0 });
+cvs.addEventListener(`mouseout`, () => hillShade());
+hillShade();

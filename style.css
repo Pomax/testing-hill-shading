@@ -75,13 +75,12 @@ to this section's matching END comment to see page-specific styles.
 
 /* Navigation grid */
 .footer {
-  display: flex;
+  position: fixed;
+  bottom: 0;
+  right: 0;
   justify-content: space-between;
-  margin: 1rem auto 0;
+  margin: 1rem;
   padding: 1rem 0 0.75rem 0;
-  width: 100%;
-  flex-wrap: wrap;
-  border-top: 4px solid #fff;
 }
 
 .footer a:not(.btn--remix):link,
