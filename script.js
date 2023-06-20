@@ -1,5 +1,7 @@
+const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.png?v=1687285523873`;
+
 // plain math
-const { abs, sin, cos, atan2, PI, log, sqrt } = Math;
+const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
 
 // vector math
 const sub = (v1, v2) => ({ x: v1.x - v2.x, y: v1.y - v2.y, z: v1.z - v2.z });
@@ -14,7 +16,7 @@ const reflect = (ray, normal) => {
   return sub(muls(normal, 2 * dot(ray, normal)), ray);
 };
 
-const lerp = (r,a,b) => (1-r)*a + r*b;
+const lerp = (r, a, b) => (1 - r) * a + r * b;
 
 const map = (v, ds, de, ts, te) => {
   const d = de - ds;
@@ -33,20 +35,19 @@ cvs.width = cvs.height = w;
 const ctx = cvs.getContext(`2d`);
 const im = new Image();
 im.crossOrigin = `anonymous`;
-im.src = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.png?v=1687285523873`;
+im.src = SOURCE;
 
 // hill shader
 function hillShade(evt) {
   ctx.drawImage(im, 0, 0, w, h);
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
-  const pixels = imageData.data;
   const shaded = ctx.createImageData(w, h);
 
   const getElevation = (x, y) => {
     x = x < 0 ? 0 : x >= w ? w - 1 : x;
     y = y < 0 ? 0 : y >= h ? h - 1 : y;
-    return pixels[4 * (x + y * w)];
+    return imageData.data[4 * (x + y * w)];
   };
 
   const { width, height } = cvs.getBoundingClientRect();
@@ -54,11 +55,15 @@ function hillShade(evt) {
   const h2 = height / 2;
   let x = -(100 * (evt.offsetX - w2)) / w2;
   let y = -(100 * (evt.offsetY - h2)) / h2;
-  const light = { x: -x, y: -y, z: 1 };
 
-  let max = 0;
-  const blend = (a,b) => lerp(0.9, a, b);
-  const F = v => constrain(map(v,0,1,0,255),0,255);
+  const B = 0.9;
+  const blend = (a, b) => (1 - B) * a + B * b;
+  const F = (v) => constrain(map(v, 0, 1, 150, 255), 0, 255);
+
+  const light = { x: -x, y: -y, z: 1 };
+  const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
+  const flatValue = F(f.z);
+  console.log(flatValue);
 
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
@@ -68,18 +73,19 @@ function hillShade(evt) {
       const b = getElevation(x + 1, y);
       const c = getElevation(x, y - 1);
       const d = getElevation(x, y + 1);
+
       const n = unit({ x: a - b, y: c - d, z: 2 });
 
       // compute illumination
-      const reflection = unit(reflect(light, n));
-      const z = reflection.z ** 0.25;
-      const e = F(z);
+      const r1 = unit(reflect(light, n));
+      const z1 = r1.z;
+      const e = F(z1);
 
       // noise reduction using the alpha channel
       shaded.data[i + 0] = blend(F(n.x), e);
       shaded.data[i + 1] = blend(F(n.y), e);
       shaded.data[i + 2] = blend(F(n.z), e);
-      shaded.data[i + 3] = 255;
+      shaded.data[i + 3] = e === flatValue ? 0 : 255;
     }
   }
 
