@@ -41,8 +41,14 @@
     
     <ul>
       <li>We have a height map (the base image)</li>
-      <li>We can compute the "surface normal" for each pixel by looking at its four direct neighbours,  have a height map (the base image)</li>
+      <li>We can compute the "surface normal" for each pixel by looking at its four direct neighbours, creating a vector {a-b,c-d,2} where "a" and "b" are the height at (x-1,y) and (x+1,y) respectively, and "c" and "d" are the height at (x,y-1) and (x,y+1), respectively</li>
+      <li>We then check how much light would get reflected "up" into the screen, if the light is coming from a direction that's tied to where your cursor is on the image</li>
+      <li>And then we can recolour every pixel with that value instead of its original value</li>
     </ul>
+    
+    <p>
+      
+    </p>
 
     <!-- The footer holds our remix button — you can keep or delete it ✂ -->
     <footer class="footer">
