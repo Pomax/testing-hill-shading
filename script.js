@@ -44,10 +44,11 @@ bg.src = BGSOURCE;
 
 // hill shader
 function hillShade(evt) {
-  ctx.globalCompositeOperation = "source-over";
-  ctx.filter = `blur(4px)`;
-  ctx.drawImage(im, 0, 0, w, h);
   
+  ctx.filter = `blur(2px)`;
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.drawImage(im, 0, 0, w, h);
   
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
@@ -70,7 +71,7 @@ function hillShade(evt) {
 
   const F = (v) => constrain(map(v, 0, 1, 127, 255), 0, 255);
 
-  const light = { x: -x, y: -y, z: 10 };
+  const light = { x: -x, y: -y, z: 1 };
   const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   const flatValue = F(f.z);
   console.log(flatValue);
@@ -119,7 +120,7 @@ function hillShade(evt) {
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
 
-  ctx.globalCompositeOperation = "source-over";
+  ctx.globalCompositeOperation = "color-burn";
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
 
