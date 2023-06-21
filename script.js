@@ -57,9 +57,9 @@ function hillShade(evt) {
   let x = -(100 * (evt.offsetX - w2)) / w2;
   let y = -(100 * (evt.offsetY - h2)) / h2;
 
-  const F = (v) => constrain(map(v, 0, 1, 120, 255), 0, 255);
+  const F = (v) => constrain(map(v, 0, 1, 100, 255), 0, 255);
 
-  const light = { x: -x, y: -y, z: 1 };
+  const light = { x: -x, y: -y, z: 10 };
   const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   const flatValue = F(f.z);
   console.log(flatValue);
@@ -96,7 +96,10 @@ function hillShade(evt) {
       shaded.data[i + 0] = blend(F(n.x), e);
       shaded.data[i + 1] = blend(F(n.y), e);
       shaded.data[i + 2] = blend(F(n.z), e);
-      shaded.data[i + 3] = e === flatValue ? 0 : 255;
+      
+      const a = map(abs(e-flatValue), 0, 255-flatValue, 0, 255);
+      
+      shaded.data[i + 3] = a;//e === flatValue ? 0 : 255;
     }
   }
 
