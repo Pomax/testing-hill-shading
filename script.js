@@ -1,4 +1,5 @@
 const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.png?v=1687285523873`;
+const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/map-bg.png?v=1687323043207`;
 
 // plain math
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
@@ -36,15 +37,25 @@ const ctx = cvs.getContext(`2d`);
 const im = new Image();
 im.crossOrigin = `anonymous`;
 im.src = SOURCE;
-ctx.filter = `blur(4px)`;
+
+const bg = new Image();
+bg.crossOrigin = `anonymous`;
+bg.src = BGSOURCE;
 
 // hill shader
 function hillShade(evt) {
+  ctx.globalCompositeOperation = "source-over";
+  ctx.filter = `blur(4px)`;
   ctx.drawImage(im, 0, 0, w, h);
+  
+  
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
   const shaded = ctx.createImageData(w, h);
 
+  ctx.filter = `blur(0px)`;
+  ctx.drawImage(bg, 0, 0, w, h);
+  
   const getElevation = (x, y) => {
     x = x < 0 ? 0 : x >= w ? w - 1 : x;
     y = y < 0 ? 0 : y >= h ? h - 1 : y;
@@ -99,11 +110,17 @@ function hillShade(evt) {
       
       const a = map(abs(e-flatValue), 0, 255-flatValue, 0, 255);
       
-      shaded.data[i + 3] = a;//e === flatValue ? 0 : 255;
+      shaded.data[i + 3] = 255; // a;//e === flatValue ? 0 : 255;
     }
   }
+  
+  let cvs2 = document.createElement(`canvas`);
+  cvs2.width = cvs2.height = w;
+  let ctx2 = cvs2.getContext(`2d`);
+  ctx2.putImageData(shaded, 0, 0);
 
-  ctx.putImageData(shaded, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.drawImage(cvs2, 0, 0, w, h);
 }
 
 cvs.addEventListener(`mousemove`, hillShade);
