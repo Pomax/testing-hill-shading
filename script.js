@@ -56,25 +56,33 @@ function hillShade(evt) {
   let x = -(100 * (evt.offsetX - w2)) / w2;
   let y = -(100 * (evt.offsetY - h2)) / h2;
 
-  const B = 0.9;
-  const blend = (a, b) => (1 - B) * a + B * b;
-  const F = (v) => constrain(map(v, 0, 1, 150, 255), 0, 255);
+  const F = (v) => constrain(map(v, 0, 1, 0, 255), 0, 255);
 
   const light = { x: -x, y: -y, z: 1 };
   const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   const flatValue = F(f.z);
   console.log(flatValue);
 
+  // build normals
+  const normals = [];
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
-      const i = 4 * (x + y * w);
-
       const a = getElevation(x - 1, y);
       const b = getElevation(x + 1, y);
       const c = getElevation(x, y - 1);
       const d = getElevation(x, y + 1);
 
       const n = unit({ x: a - b, y: c - d, z: 2 });
+      normals.push(n);
+    }
+  }
+
+  // smoot
+  h normals
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) {
+      let i = 4 * (x + y * w);
+      const n = normals[x*w + y];
 
       // compute illumination
       const r1 = unit(reflect(light, n));
