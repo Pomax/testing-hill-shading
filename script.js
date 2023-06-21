@@ -36,7 +36,7 @@ const ctx = cvs.getContext(`2d`);
 const im = new Image();
 im.crossOrigin = `anonymous`;
 im.src = SOURCE;
-ctx.filter = `blur(3px)`;
+ctx.filter = `blur(4px)`;
 
 // hill shader
 function hillShade(evt) {
@@ -57,7 +57,7 @@ function hillShade(evt) {
   let x = -(100 * (evt.offsetX - w2)) / w2;
   let y = -(100 * (evt.offsetY - h2)) / h2;
 
-  const F = (v) => constrain(map(v, 0, 1, 100, 255), 0, 255);
+  const F = (v) => constrain(map(v, 0, 1, 127, 255), 0, 255);
 
   const light = { x: -x, y: -y, z: 10 };
   const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
