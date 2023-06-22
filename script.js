@@ -34,6 +34,15 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
+
+
+let compositionStrategy = `color-burn`;
+blendMode.addEventListener(`change`, evt => {
+  const s = evt.target;
+  const v = s.options[s.selectedIndex].textContent;
+  compositionStrategy = v;
+})
+
 const w = 800;
 const h = w;
 cvs.width = cvs.height = w;
@@ -124,7 +133,7 @@ function hillShade(evt) {
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
 
-  ctx.globalCompositeOperation = "color-burn";
+  ctx.globalCompositeOperation = compositionStrategy;
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
 
