@@ -71,28 +71,33 @@ const reverseEndian = (pngPixels8) => {
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
 const equal = (s1, s2) => {
-  for (let i=0, e=s2.length; i<e; i++) {
+  for (let i = 0, e = s2.length; i < e; i++) {
     if (s1[i] !== s2[i]) return false;
   }
   return true;
-}
+};
 
 const indexOf = (ab, sequence) => {
   let first = sequence[0];
   let len = sequence.length;
-  if (typeof first === `string`) first = first.charCodeAt(0);
-  let pos = 0;
+  if (typeof first === `string`) {
+    sequence = sequence.split(``).map((v) => v.charCodeAt(0));
+    first = sequence[0];
+  }
+  let pos = -1;
   let found = false;
   while (!found) {
-    console.log(ab, first);
-    pos = ab.indexOf(first, pos);
-    console.log(`result`, pos);
+    // console.log(ab, first);
+    pos = ab.indexOf(first, pos + 1);
+    // console.log(`result for`, sequence, `:`, pos);
     if (pos === -1) return -1;
-    if (equal(ab.slice(pos, pos+len), sequence)) return pos;
-    
+    const s1 = ab.slice(pos, pos + len);
+    const s2 = sequence;
+    // console.log(s1, s2);
+    if (equal(s1, s2)) return pos;
   }
-  return -1
-}
+  return -1;
+};
 
 function readPNG(pngPath, data) {
   data = new Uint8Array(data);
@@ -111,25 +116,24 @@ function readPNG(pngPath, data) {
     const slice = imageData.subarray(s, s + width);
     bytes.set(slice, y * width);
   }
-  if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
-  const gpos = indexOf(data, `tEXt`); 
+  const gpos = indexOf(data, `tEXt`);
   const bts = data.subarray(gpos - 4, gpos);
-  console.log(bts);
   const glen = from4b(bts);
-
-  console.log(asString.substring(gpos-4), glen);
-
-  const json = asString.substring(indexOf(data, `GeoTags`) + 8, gpos + 4 + glen);
+  const json = new TextDecoder().decode(
+    data.subarray(indexOf(data, `GeoTags`) + 8, gpos + 4 + glen)
+  );
   const geoTags = JSON.parse(json.toString());
   return { width, height, pixels, geoTags };
 }
 
-
-
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
-  .then((data) => console.log(readPNG(SOURCE, data)));
+  .then((data) => {
+    const { height, width, pixels, geoTags } = readPNG(SOURCE, data);
+    console.log(pixels[0]);
+    console.log(geoTags);
+  });
 
 const bg = new Image();
 bg.crossOrigin = `anonymous`;
