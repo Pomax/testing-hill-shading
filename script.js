@@ -107,15 +107,17 @@ function readPNG(pngPath, data) {
   const pos = indexOf(data, `IDAT`);
   const length = from4b(data.subarray(pos - 4, pos));
   const deflated = data.subarray(pos + 4, pos + 4 + length);
-  const imageData = pako.deflate(deflated);
+  const imageData = pako.inflate(deflated);
   // Convert scan lines into pixels
-  const bytes = new Int8Array(width * height * 2);
+  const bytes = new Uint8Array(width * height * 2);
   for (let y = 0; y < height; y++) {
     // skip over the first byte, which is the scanline's filter type byte.
     const s = 1 + y * (width + 1);
     const slice = imageData.subarray(s, s + width);
     bytes.set(slice, y * width);
   }
+  if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
+  console.log(bytes.subarray(0,4));
   const pixels = new Int16Array(bytes.buffer);
   const gpos = indexOf(data, `tEXt`);
   const bts = data.subarray(gpos - 4, gpos);
@@ -131,7 +133,7 @@ fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
     const { height, width, pixels, geoTags } = readPNG(SOURCE, data);
-    console.log(pixels[0]);
+    console.log(pixels);
     console.log(geoTags);
   });
 
