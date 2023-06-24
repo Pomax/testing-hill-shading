@@ -42,8 +42,8 @@ blendMode.addEventListener(`change`, (evt) => {
   compositionStrategy = v;
 });
 
-const w = 800;
-const h = w;
+let w = 800;
+let h = w;
 cvs.width = cvs.height = w;
 const ctx = cvs.getContext(`2d`);
 const im = new Image();
@@ -117,7 +117,7 @@ function readPNG(pngPath, data) {
     bytes.set(slice, y * width);
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
-  console.log(bytes.subarray(0,4));
+  console.log(bytes.subarray(0, 4));
   const pixels = new Int16Array(bytes.buffer);
   const gpos = indexOf(data, `tEXt`);
   const bts = data.subarray(gpos - 4, gpos);
@@ -132,9 +132,22 @@ function readPNG(pngPath, data) {
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
-    const { height, width, pixels, geoTags } = readPNG(SOURCE, data);
-    console.log(pixels);
-    console.log(geoTags);
+    data = readPNG(SOURCE, data);
+    const { height, width, pixels, geoTags } = data;
+    // build normals
+    const normals = [];
+    const getElevation = (x, y) => pixels[x + y * height];
+    for (let x = 0; x < w; x++) {
+      for (let y = 0; y < h; y++) {
+        const a = getElevation(x - 1, y);
+        const b = getElevation(x + 1, y);
+        const c = getElevation(x, y - 1);
+        const d = getElevation(x, y + 1);
+        const n = unit({ x: a - b, y: c - d, z: 2 });
+        normals.push(n);
+      }
+    }
+    hillShade({ offsetX: 0, offsetY: 0 }, width, height, normals);
   });
 
 const bg = new Image();
@@ -142,7 +155,7 @@ bg.crossOrigin = `anonymous`;
 bg.src = BGSOURCE;
 
 // hill shader
-function hillShade(evt) {
+function hillShade(evt, wn, hn, normals) {
   ctx.filter = `blur(2px)`;
 
   ctx.globalCompositeOperation = "source-over";
@@ -150,7 +163,7 @@ function hillShade(evt) {
 
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
-  const shaded = ctx.createImageData(w, h);
+  const shaded = ctx.createImageData(wn ?? w, hn ?? h);
 
   ctx.filter = `blur(0px)`;
   ctx.drawImage(bg, 0, 0, w, h);
@@ -175,23 +188,27 @@ function hillShade(evt) {
   console.log(flatValue);
 
   // build normals
-  const normals = [];
-  for (let x = 0; x < w; x++) {
-    for (let y = 0; y < h; y++) {
-      const a = getElevation(x - 1, y);
-      const b = getElevation(x + 1, y);
-      const c = getElevation(x, y - 1);
-      const d = getElevation(x, y + 1);
-
-      const n = unit({ x: a - b, y: c - d, z: 2 });
-      normals.push(n);
+  if (!normals) {
+    normals = [];
+    for (let x = 0; x < w; x++) {
+      for (let y = 0; y < h; y++) {
+        const a = getElevation(x - 1, y);
+        const b = getElevation(x + 1, y);
+        const c = getElevation(x, y - 1);
+        const d = getElevation(x, y + 1);
+        const n = unit({ x: a - b, y: c - d, z: 2 });
+        normals.push(n);
+      }
     }
+  } else {
+    w = wn;
+    h = hn;
   }
 
   const B = 1;
   const blend = (a, b) => (1 - B) * a + B * b;
 
-  // smooth normals
+  // illuminate~
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       let i = 4 * (x + y * w);
