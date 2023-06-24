@@ -74,11 +74,12 @@ function readPNG(pngPath, data) {
   console.log(data, data.subarray);
   data ??= readFileSync(pngPath);
   data = new Uint8Array(data);
-  const asString = data.map(v => String.fromCharCode(v));
+  const asString = new TextDecoder().decode(data);
   // Get the raster dimensions
   const width = from4b(data.subarray(16, 20));
   const height = from4b(data.subarray(20, 24));
   const pos = asString.indexOf(`IDAT`);
+  console.log(`pos: ${pos}`);
   const length = from4b(data.subarray(pos - 4, pos));
   const deflated = data.subarray(pos + 4, pos + 4 + length);
   const imageData = pako.deflate(deflated);
@@ -93,8 +94,9 @@ function readPNG(pngPath, data) {
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
   const gpos = asString.indexOf(`tEXt`);
+  console.log(`gpos: ${gpos}`);
   const glen = from4b(data.subarray(gpos - 4, gpos));
-  const json = data.subarray(asString.indexOf(`GeoTags`) + 8, gpos + 4 + glen);
+  const json = asString.substring(asString.indexOf(`GeoTags`) + 8, gpos + 4 + glen);
   console.log(json);
   const geoTags = JSON.parse(json.toString());
   return { width, height, pixels, geoTags };
