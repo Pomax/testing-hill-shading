@@ -70,27 +70,36 @@ const reverseEndian = (pngPixels8) => {
 
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
-const indexOf = (ab, sequence) {
+const equal = (s1, s2) => {
+  for (let i=0, e=s2.length; i<e; i++) {
+    if (s1[i] !== s2[i]) return false;
+  }
+  return true;
+}
+
+const indexOf = (ab, sequence) => {
   let first = sequence[0];
+  let len = sequence.length;
   if (typeof first === `string`) first = first.charCodeAt(0);
-  let pos = -1;
+  let pos = 0;
   let found = false;
   while (!found) {
-    pos = ab.indexOf()
+    console.log(ab, first);
+    pos = ab.indexOf(first, pos);
+    console.log(`result`, pos);
+    if (pos === -1) return -1;
+    if (equal(ab.slice(pos, pos+len), sequence)) return pos;
     
   }
   return -1
 }
 
 function readPNG(pngPath, data) {
-  console.log(data, data.subarray);
-  data ??= readFileSync(pngPath);
   data = new Uint8Array(data);
-  const asString = new TextDecoder().decode(data);
   // Get the raster dimensions
   const width = from4b(data.subarray(16, 20));
   const height = from4b(data.subarray(20, 24));
-  const pos = asString.indexOf(`IDAT`);
+  const pos = indexOf(data, `IDAT`);
   const length = from4b(data.subarray(pos - 4, pos));
   const deflated = data.subarray(pos + 4, pos + 4 + length);
   const imageData = pako.deflate(deflated);
@@ -104,14 +113,14 @@ function readPNG(pngPath, data) {
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
-  const gpos = asString.indexOf(`tEXt`); 
+  const gpos = indexOf(data, `tEXt`); 
   const bts = data.subarray(gpos - 4, gpos);
   console.log(bts);
   const glen = from4b(bts);
 
   console.log(asString.substring(gpos-4), glen);
 
-  const json = asString.substring(asString.indexOf(`GeoTags`) + 8, gpos + 4 + glen);
+  const json = asString.substring(indexOf(data, `GeoTags`) + 8, gpos + 4 + glen);
   const geoTags = JSON.parse(json.toString());
   return { width, height, pixels, geoTags };
 }
