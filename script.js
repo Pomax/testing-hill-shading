@@ -137,8 +137,8 @@ fetch(SOURCE)
     // build normals
     const normals = [];
     const getElevation = (x, y) => pixels[x + y * height];
-    for (let x = 0; x < w; x++) {
-      for (let y = 0; y < h; y++) {
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
         const a = getElevation(x - 1, y);
         const b = getElevation(x + 1, y);
         const c = getElevation(x, y - 1);
@@ -156,6 +156,7 @@ bg.src = BGSOURCE;
 
 // hill shader
 function hillShade(evt, wn, hn, normals) {
+  
   ctx.filter = `blur(2px)`;
 
   ctx.globalCompositeOperation = "source-over";
@@ -163,7 +164,6 @@ function hillShade(evt, wn, hn, normals) {
 
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
-  const shaded = ctx.createImageData(wn ?? w, hn ?? h);
 
   ctx.filter = `blur(0px)`;
   ctx.drawImage(bg, 0, 0, w, h);
@@ -185,7 +185,6 @@ function hillShade(evt, wn, hn, normals) {
   const light = { x: -x, y: -y, z: 1 };
   const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   const flatValue = F(f.z);
-  console.log(flatValue);
 
   // build normals
   if (!normals) {
@@ -209,13 +208,14 @@ function hillShade(evt, wn, hn, normals) {
   const blend = (a, b) => (1 - B) * a + B * b;
 
   // illuminate~
+  const shaded = ctx.createImageData(w, h);
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
-      let i = 4 * (x + y * w);
-      const n = normals[x * w + y];
+      let i = 4 * (x + y*w);
+      const n = normals[x + y*w];
 
       // compute illumination
-      const r1 = unit(reflect(light, n));
+      let r1 = unit(reflect(light, n));
       const z1 = r1.z;
       const e = F(z1);
 
