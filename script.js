@@ -53,6 +53,8 @@ const im = new Image();
 im.crossOrigin = `anonymous`;
 im.src = SOURCE;
 
+fetch(SOURCE, { crossOrigin: anonymous }).then(r => r.arrayBuffer()).then(data => console.log(data));
+
 const bg = new Image();
 bg.crossOrigin = `anonymous`;
 bg.src = BGSOURCE;
