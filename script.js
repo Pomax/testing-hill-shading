@@ -212,7 +212,7 @@ function hillShade(evt, wn, hn, normals) {
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       let i = 4 * (x + y*w);
-      const n = normals[x + y*w];
+      const n = normals[y + x*w];
 
       // compute illumination
       let r1 = unit(reflect(light, n));
