@@ -6,7 +6,6 @@
 const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.900m.png?v=1687554379843`;
 const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/%7B8A7EABCD-1E72-41AE-B63F-380C926F1A07%7D.png`;
 
-
 // plain math
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
 
@@ -36,14 +35,12 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
-
-
 let compositionStrategy = `color-burn`;
-blendMode.addEventListener(`change`, evt => {
+blendMode.addEventListener(`change`, (evt) => {
   const s = evt.target;
   const v = s.options[s.selectedIndex].textContent;
   compositionStrategy = v;
-})
+});
 
 const w = 800;
 const h = w;
@@ -53,7 +50,61 @@ const im = new Image();
 im.crossOrigin = `anonymous`;
 im.src = SOURCE;
 
-fetch(SOURCE, { crossOrigin: anonymous }).then(r => r.arrayBuffer()).then(data => console.log(data));
+const LITTLE_ENDIAN = Symbol(`little endian`);
+const BIG_ENDIAN = Symbol(`big endian`);
+const endian = (function checkEndian() {
+  const buf = new ArrayBuffer(2);
+  const u8 = new Uint8Array(buf);
+  const u16 = new Uint16Array(buf);
+  u8.set([0xaa, 0xbb], 0);
+  return u16[0] === 0xbbaa ? LITTLE_ENDIAN : BIG_ENDIAN;
+})();
+
+const reverseEndian = (pngPixels8) => {
+  for (let i = 0, e = pngPixels8.length; i < e; i += 2) {
+    let _ = pngPixels8[i];
+    pngPixels8[i] = pngPixels8[i + 1];
+    pngPixels8[i + 1] = _;
+  }
+};
+
+const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+
+function readPNG(pngPath, data) {
+  console.log(data, data.subarray);
+  data ??= readFileSync(pngPath);
+  data = new Uint8Array(data);
+  const asString = data.map(v => String.fromCharCode(v));
+  // Get the raster dimensions
+  const width = from4b(data.subarray(16, 20));
+  const height = from4b(data.subarray(20, 24));
+  const pos = asString.indexOf(`IDAT`);
+  const length = from4b(data.subarray(pos - 4, pos));
+  const deflated = data.subarray(pos + 4, pos + 4 + length);
+  const imageData = pako.deflate(deflated);
+  // Convert scan lines into pixels
+  const bytes = new Int8Array(width * height * 2);
+  for (let y = 0; y < height; y++) {
+    // skip over the first byte, which is the scanline's filter type byte.
+    const s = 1 + y * (width + 1);
+    const slice = imageData.subarray(s, s + width);
+    bytes.set(slice, y * width);
+  }
+  if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
+  const pixels = new Int16Array(bytes.buffer);
+  const gpos = asString.indexOf(`tEXt`);
+  const glen = from4b(data.subarray(gpos - 4, gpos));
+  const json = data.subarray(asString.indexOf(`GeoTags`) + 8, gpos + 4 + glen);
+  console.log(json);
+  const geoTags = JSON.parse(json.toString());
+  return { width, height, pixels, geoTags };
+}
+
+
+
+fetch(SOURCE)
+  .then((r) => r.arrayBuffer())
+  .then((data) => console.log(readPNG(SOURCE, data)));
 
 const bg = new Image();
 bg.crossOrigin = `anonymous`;
@@ -61,19 +112,18 @@ bg.src = BGSOURCE;
 
 // hill shader
 function hillShade(evt) {
-  
   ctx.filter = `blur(2px)`;
 
   ctx.globalCompositeOperation = "source-over";
   ctx.drawImage(im, 0, 0, w, h);
-  
+
   if (!evt) return;
   const imageData = ctx.getImageData(0, 0, w, h);
   const shaded = ctx.createImageData(w, h);
 
   ctx.filter = `blur(0px)`;
   ctx.drawImage(bg, 0, 0, w, h);
-  
+
   const getElevation = (x, y) => {
     x = x < 0 ? 0 : x >= w ? w - 1 : x;
     y = y < 0 ? 0 : y >= h ? h - 1 : y;
@@ -125,13 +175,13 @@ function hillShade(evt) {
       shaded.data[i + 0] = blend(F(n.x), e);
       shaded.data[i + 1] = blend(F(n.y), e);
       shaded.data[i + 2] = blend(F(n.z), e);
-      
-      const a = map(abs(e-flatValue), 0, 255-flatValue, 0, 255);
-      
+
+      const a = map(abs(e - flatValue), 0, 255 - flatValue, 0, 255);
+
       shaded.data[i + 3] = 255; // a;//e === flatValue ? 0 : 255;
     }
   }
-  
+
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = cvs2.height = w;
   let ctx2 = cvs2.getContext(`2d`);
