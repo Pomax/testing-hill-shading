@@ -70,6 +70,18 @@ const reverseEndian = (pngPixels8) => {
 
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
+const indexOf = (ab, sequence) {
+  let first = sequence[0];
+  if (typeof first === `string`) first = first.charCodeAt(0);
+  let pos = -1;
+  let found = false;
+  while (!found) {
+    pos = ab.indexOf()
+    
+  }
+  return -1
+}
+
 function readPNG(pngPath, data) {
   console.log(data, data.subarray);
   data ??= readFileSync(pngPath);
@@ -79,7 +91,6 @@ function readPNG(pngPath, data) {
   const width = from4b(data.subarray(16, 20));
   const height = from4b(data.subarray(20, 24));
   const pos = asString.indexOf(`IDAT`);
-  console.log(`pos: ${pos}`);
   const length = from4b(data.subarray(pos - 4, pos));
   const deflated = data.subarray(pos + 4, pos + 4 + length);
   const imageData = pako.deflate(deflated);
@@ -93,11 +104,14 @@ function readPNG(pngPath, data) {
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
-  const gpos = asString.indexOf(`tEXt`);
-  console.log(`gpos: ${gpos}`);
-  const glen = from4b(data.subarray(gpos - 4, gpos));
+  const gpos = asString.indexOf(`tEXt`); 
+  const bts = data.subarray(gpos - 4, gpos);
+  console.log(bts);
+  const glen = from4b(bts);
+
+  console.log(asString.substring(gpos-4), glen);
+
   const json = asString.substring(asString.indexOf(`GeoTags`) + 8, gpos + 4 + glen);
-  console.log(json);
   const geoTags = JSON.parse(json.toString());
   return { width, height, pixels, geoTags };
 }
