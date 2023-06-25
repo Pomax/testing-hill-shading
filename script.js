@@ -176,9 +176,9 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrainMap(v, -1, 1, 0, 255) | 0;
+  const F = (v) => constrainMap(v, 0, 1, 0, 255);
 
-  const light = { x: -300, y: -300, z: 10 };
+  const light = unit({ x: -100, y: 300, z: 10 });
 
   // illuminate
   const drawPixels = false;
@@ -191,14 +191,12 @@ function hillShade(width, height, pixels, normals, geoTags) {
       const p = pixels[i];
       const n = normals[i];
 
-      // compute illumination for this pixel
-      const r = reflect(light, n);
-      let e = (r.z * 100) | 0;
-      histogram[e] = (histogram[e] ?? 0) + 1;
+      // Compute illumination for this pixel with some
+      // non-linear scaling to make the terrain "pop".
+      const r = unit(reflect(light, n));
+      const e = constrainMap(r.z ** 0.1, 0, 1, 0, 255);
 
-      e = F(r.z);
-
-      // Update from pixel index to canvas RGBA offset
+      // Update the pixel index to a canvas RGBA offset
       i = 4 * i;
 
       // Set alpha to opaque
@@ -210,26 +208,26 @@ function hillShade(width, height, pixels, normals, geoTags) {
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 2] = constrainMap(p, -500, 9000, 0, 255) | 0;
       } else {
-        shaded.data[i + 0] = F(n.x);
-        shaded.data[i + 1] = F(n.y);
-        shaded.data[i + 2] = F(n.z);
+        shaded.data[i + 0] = F(n.x) | 0;
+        shaded.data[i + 1] = F(n.y) | 0;
+        shaded.data[i + 2] = F(n.z) | 0;
       }
 
       if (drawHill) {
         const r = 1;
-        shaded.data[i + 0] = lerp(r, F(n.x), e);
-        shaded.data[i + 1] = lerp(r, F(n.y), e);
-        shaded.data[i + 2] = lerp(r, F(n.z), e);
+        shaded.data[i + 0] = lerp(r, F(n.x), e) | 0;
+        shaded.data[i + 1] = lerp(r, F(n.y), e) | 0;
+        shaded.data[i + 2] = lerp(r, F(n.z), e) | 0;
       }
     }
   }
-
-  console.table(histogram);
 
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = width;
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
-  ctx.drawImage(cvs2, 0, 0, w, h);
+  ctx.drawImage(bg, 0, 0, w, h);
+  ctx.set
+  //ctx.drawImage(cvs2, 0, 0, w, h);
 }
