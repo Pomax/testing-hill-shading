@@ -43,11 +43,10 @@ const constrain = (v, m, M) => {
 };
 
 const constrainMap = (v, s, e, m, M) => {
-  return constrain(map(v,s,e,m,M),m,M);
+  return constrain(map(v, s, e, m, M), m, M);
 };
 
 const F = (v) => constrainMap(v, 0, 1, 0, 255);
-
 
 // let compositionStrategy = `source-in`;
 // blendMode.addEventListener(`change`, (evt) => {
@@ -122,15 +121,12 @@ function readPNG(pngPath, data) {
   const length = from4b(data.subarray(pos - 4, pos));
   const deflated = data.subarray(pos + 4, pos + 4 + length);
   const imageData = pako.inflate(deflated);
-  // Convert scan lines into pixels
+  // Convert scan lines into 16 bit pixels rows
   const bytes = new Uint8Array(width * height * 2);
-  console.log(`reading ${bytes.length/2} int16s`);
+  console.log(`reading ${bytes.length / 2} int16s`);
   for (let y = 0; y < height; y++) {
-    // skip over the first byte, which is the scanline's filter type byte.
-    const s = 1 + y * (width + 1);
-    const slice = imageData.subarray(s, s + width);
-    for (let x = 0; x<width; x++) {
-      bytes[x + y*width] = slice[x], y * width);
+    for (let x = 0; x < width; x++) {
+      bytes[x + y * width] = imageData[1 + x + y*(width+1)];
     }
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
@@ -172,7 +168,6 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-
   // const light = { x: -x, y: -y, z: 1 };
   // const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   // const flatValue = F(f.z);
@@ -186,7 +181,7 @@ function hillShade(width, height, pixels, normals, geoTags) {
   let i = 0;
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      i = (x + y * width);
+      i = x + y * width;
       const p = pixels[i];
       const n = normals[i];
 
@@ -199,10 +194,10 @@ function hillShade(width, height, pixels, normals, geoTags) {
       // shaded.data[i + 0] = F(n.x); // blend(F(n.x), e);
       // shaded.data[i + 1] = F(n.y); // blend(F(n.y), e);
       // shaded.data[i + 2] = F(n.z); // blend(F(n.z), e);
-      shaded.data[4*i + 0] = constrainMap(p,-500,9000,0,255) | 0;
-      shaded.data[4*i + 1] = constrainMap(p,-500,9000,0,255) | 0;
-      shaded.data[4*i + 2] = constrainMap(p,-500,9000,0,255) | 0;
-      shaded.data[4*i + 3] = 255;
+      shaded.data[4 * i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
+      shaded.data[4 * i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
+      shaded.data[4 * i + 2] = constrainMap(p, -500, 9000, 0, 255) | 0;
+      shaded.data[4 * i + 3] = 255;
     }
   }
 
