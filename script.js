@@ -242,6 +242,5 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   ctx.drawImage(bg, 0, 0, w, h);
 
   ctx.globalCompositeOperation = compositionStrategy;
-  ctx.filter = `opacity(0.8)`;
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
