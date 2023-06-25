@@ -46,20 +46,22 @@ const constrainMap = (v, s, e, m, M) => {
   return constrain(map(v, s, e, m, M), m, M);
 };
 
-// let compositionStrategy = `source-in`;
-// blendMode.addEventListener(`change`, (evt) => {
-//   const s = evt.target;
-//   const v = s.options[s.selectedIndex].textContent;
-//   compositionStrategy = v;
-// });
+let hillShade = () => {};
+
+let compositionStrategy = `color-burn`;
+const blendMode = document.getElementById(`blendMode`);
+blendMode.addEventListener(`change`, (evt) => {
+  const s = evt.target;
+  const v = s.options[s.selectedIndex].textContent;
+  compositionStrategy = v;
+  console.log(v);
+  hillShade();
+});
 
 let w = 800;
 let h = w;
 cvs.width = cvs.height = w;
-const ctx = cvs.getContext(`2d`);
-const im = new Image();
-im.crossOrigin = `anonymous`;
-im.src = SOURCE;
+let ctx = cvs.getContext(`2d`);
 
 const LITTLE_ENDIAN = Symbol(`little endian`);
 const BIG_ENDIAN = Symbol(`big endian`);
@@ -170,14 +172,21 @@ fetch(SOURCE)
       }
     }
 
-    // Hill-shade our image
-    hillShade(width, height, pixels, normals, geoTags);
+    // Set up the hillshading function
+    hillShade = () => runHillShade(width, height, pixels, normals, geoTags);
+  
+    // And then hill-shade our image
+    hillShade();
   });
 
 // hill shader
-function hillShade(width, height, pixels, normals, geoTags) {
+function runHillShade(width, height, pixels, normals, geoTags) {
+  console.log(`running`);
+  
+  cvs.width = cvs.height = w;
+  ctx = cvs.getContext(`2d`);
+  
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
-
   const light = unit({ x: -100, y: 300, z: 10 });
 
   // illuminate
@@ -227,7 +236,10 @@ function hillShade(width, height, pixels, normals, geoTags) {
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
+  
+  ctx.globalCompositeOperation = "source-out";
   ctx.drawImage(bg, 0, 0, w, h);
-  ctx.set
-  //ctx.drawImage(cvs2, 0, 0, w, h);
+
+  ctx.globalCompositeOperation = compositionStrategy;
+  ctx.drawImage(cvs2, 0, 0, w, h);
 }
