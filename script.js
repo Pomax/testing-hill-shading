@@ -1,3 +1,6 @@
+const cvs = document.getElementById(`cvs`);
+const pako = globalThis.pako;
+
 //const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.png`;
 //const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/map-bg.png`;
 
@@ -5,6 +8,10 @@
 // const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.300m.png?v=1687532784316`;
 const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W120_DSM.900m.png?v=1687554379843`;
 const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/%7B8A7EABCD-1E72-41AE-B63F-380C926F1A07%7D.png`;
+
+const bg = new Image();
+bg.crossOrigin = `anonymous`;
+bg.src = BGSOURCE;
 
 // plain math
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
@@ -35,12 +42,12 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
-let compositionStrategy = `source-in`;
-blendMode.addEventListener(`change`, (evt) => {
-  const s = evt.target;
-  const v = s.options[s.selectedIndex].textContent;
-  compositionStrategy = v;
-});
+// let compositionStrategy = `source-in`;
+// blendMode.addEventListener(`change`, (evt) => {
+//   const s = evt.target;
+//   const v = s.options[s.selectedIndex].textContent;
+//   compositionStrategy = v;
+// });
 
 let w = 800;
 let h = w;
@@ -117,7 +124,6 @@ function readPNG(pngPath, data) {
     bytes.set(slice, y * width);
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
-  console.log(bytes.subarray(0, 4));
   const pixels = new Int16Array(bytes.buffer);
   const gpos = indexOf(data, `tEXt`);
   const bts = data.subarray(gpos - 4, gpos);
@@ -129,118 +135,72 @@ function readPNG(pngPath, data) {
   return { width, height, pixels, geoTags };
 }
 
-let normals = [];
-
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
     data = readPNG(SOURCE, data);
     const { height, width, pixels, geoTags } = data;
+    const getElevation = (x, y) => {
+      if (x<0) x = 0;
+      if (x>0) x = 0;
+      pixels[x + y * width];
+    }
     // build normals
-  x
-    const getElevation = (x, y) => pixels[x + y * height];
+    const normals = [];
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         const a = getElevation(x - 1, y);
         const b = getElevation(x + 1, y);
         const c = getElevation(x, y - 1);
         const d = getElevation(x, y + 1);
-        const n = { x: a - b, y: c - d, z: 2 };
-        normals.push(n);
+        const n = unit({ x: a - b, y: c - d, z: 2 });
+        normals[x + y * width] = n;
       }
     }
-    hillShade({ offsetX: 0, offsetY: 0 }, width, height);
+    hillShade(width, height, pixels, normals, geoTags);
   });
 
-const bg = new Image();
-bg.crossOrigin = `anonymous`;
-bg.src = BGSOURCE;
-
 // hill shader
-function hillShade(evt, wn, hn) {
-  
-  ctx.filter = `blur(2px)`;
+function hillShade(width, height, pixels, normals, geoTags) {
+  const F = (v) => constrain(map(v, 0, 1, 0, 255), 0, 255);
 
-  ctx.globalCompositeOperation = "source-over";
-  ctx.drawImage(im, 0, 0, w, h);
+  // const light = { x: -x, y: -y, z: 1 };
+  // const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
+  // const flatValue = F(f.z);
 
-  if (!evt) return;
-  const imageData = ctx.getImageData(0, 0, w, h);
-
-  ctx.filter = `blur(0px)`;
-  ctx.drawImage(bg, 0, 0, w, h);
-
-  const getElevation = (x, y) => {
-    x = x < 0 ? 0 : x >= w ? w - 1 : x;
-    y = y < 0 ? 0 : y >= h ? h - 1 : y;
-    return imageData.data[4 * (x + y * w)];
-  };
-
-  const { width, height } = cvs.getBoundingClientRect();
-  const w2 = width / 2;
-  const h2 = height / 2;
-  let x = -(100 * (evt.offsetX - w2)) / w2;
-  let y = -(100 * (evt.offsetY - h2)) / h2;
-
-  const F = (v) => constrain(map(v, 0, 1, 127, 255), 0, 255);
-
-  const light = { x: -x, y: -y, z: 1 };
-  const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
-  const flatValue = F(f.z);
-
-  // build normals
-  if (normals) {
-    w = wn;
-    h = hn;
-  } else {
-    // normals = [];
-    // for (let x = 0; x < w; x++) {
-    //   for (let y = 0; y < h; y++) {
-    //     const a = getElevation(x - 1, y);
-    //     const b = getElevation(x + 1, y);
-    //     const c = getElevation(x, y - 1);
-    //     const d = getElevation(x, y + 1);
-    //     const n = { x: a - b, y: c - d, z: 2 };
-    //     normals.push(n);
-    //   }
-    // }
-  }
-
-  const B = 1;
-  const blend = (a, b) => (1 - B) * a + B * b;
+//   const B = 1;
+//   const blend = (a, b) => (1 - B) * a + B * b;
 
   // illuminate
-  const shaded = ctx.createImageData(w, h);
-  for (let x = 0; x < w; x++) {
-    for (let y = 0; y < h; y++) {
-      let i = 4 * (x + y*w);
-      const n = normals[x + y*w];
+  const shaded = ctx.createImageData(width, height);
+  let i = 0;
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      i = 4 * (x + y * width);
+      const n = normals[x + y * width];
 
-      // compute illumination
-      let r1 = unit(reflect(light, n));
-      const z1 = r1.z;
-      const e = F(z1);
+      //       // compute illumination
+      //       let r1 = unit(reflect(light, n));
+      //       const z1 = r1.z;
+      //       const e = F(z1);
 
       // noise reduction using the alpha channel
-      shaded.data[i + 0] = blend(F(n.x), e);
-      shaded.data[i + 1] = blend(F(n.y), e);
-      shaded.data[i + 2] = blend(F(n.z), e);
-
-      const a = map(abs(e - flatValue), 0, 255 - flatValue, 0, 255);
-
-      shaded.data[i + 3] = 255; // a;//e === flatValue ? 0 : 255;
+      shaded.data[i + 0] = F(n.x); // blend(F(n.x), e);
+      shaded.data[i + 1] = F(n.y); // blend(F(n.y), e);
+      shaded.data[i + 2] = F(n.z); // blend(F(n.z), e);
+      shaded.data[i + 3] = 255;
     }
   }
+  console.log(i / 4);
 
   let cvs2 = document.createElement(`canvas`);
-  cvs2.width = cvs2.height = w;
+  cvs2.width = width;
+  cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
-
-  ctx.globalCompositeOperation = compositionStrategy;
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
 
-cvs.addEventListener(`mousemove`, hillShade);
-cvs.addEventListener(`mouseout`, () => hillShade());
-hillShade();
+// cvs.addEventListener(`mousemove`, hillShade);
+// cvs.addEventListener(`mouseout`, () => hillShade());
+// hillShade();
