@@ -26,7 +26,7 @@ const unit = (v, m = mag(v)) => ({ x: v.x / m, y: v.y / m, z: v.z / m });
 const reflect = (ray, normal) => {
   ray = unit(ray);
   normal = unit(normal);
-  return sub(muls(normal, 2 * dot(ray, normal)), ray);
+  return unit(sub(muls(normal, 2 * dot(ray, normal)), ray));
 };
 
 const lerp = (r, a, b) => (1 - r) * a + r * b;
@@ -172,8 +172,8 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const light = { x: -300, y: -300, z: 1 };
-  const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
+  const light = { x: -100, y: -100, z: 1 };
+  const f = reflect(light, { x: 0, y: 0, z: 1 });
 
   const B = 1;
   const blend = (a, b) => (1 - B) * a + B * b;
@@ -192,21 +192,21 @@ function hillShade(width, height, pixels, normals, geoTags) {
       i = 4 * i;
 
       // compute illumination
-      let r1 = unit(reflect(light, n));
+      let r1 = reflect(light, n);
       const z1 = r1.z;
       const e = F(z1);
 
       const drawPixels = false;
-      const drawHill = false;
+      const drawHill = true;
 
       if (drawPixels) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 2] = constrainMap(p, -500, 9000, 0, 255) | 0;
       } else {
-        shaded.data[i + 0] = F(n.x); // blend(F(n.x), e);
-        shaded.data[i + 1] = F(n.y); // blend(F(n.y), e);
-        shaded.data[i + 2] = F(n.z); // blend(F(n.z), e);
+        shaded.data[i + 0] = F(n.x);
+        shaded.data[i + 1] = F(n.y);
+        shaded.data[i + 2] = F(n.z);
       }
 
       if (drawHill) {
