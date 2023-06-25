@@ -185,7 +185,10 @@ function runHillShade(width, height, pixels, normals, geoTags) {
 
   cvs.width = cvs.height = w;
   ctx = cvs.getContext(`2d`);
-
+  ctx.drawImage(bg, 0, 0, w, h);
+  const ctxImage = ctx.getImageData(0, 0, w, h);
+  
+  
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
   const light = unit({ x: -100, y: 300, z: 10 });
 
@@ -237,10 +240,14 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
-
-  ctx.globalCompositeOperation = "source-out";
-  ctx.drawImage(bg, 0, 0, w, h);
-
-  ctx.globalCompositeOperation = compositionStrategy;
   ctx.drawImage(cvs2, 0, 0, w, h);
+  const shadeImage = ctx.getImageData(0,0,w,h);
+  
+  ctxImage.data.forEach((v,i) => {
+    if (i%4 !== 3) {
+      shadeImage.data[i] = (shadeImage.data[i] + v)/2;
+    }
+  });
+  ctx.putImageData(shadeImage, 0, 0);
+  
 }
