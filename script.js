@@ -48,7 +48,7 @@ const constrainMap = (v, s, e, m, M) => {
 
 let hillShade = () => {};
 
-let compositionStrategy = `color-burn`;
+let compositionStrategy = `luminosity`;
 const blendMode = document.getElementById(`blendMode`);
 blendMode.addEventListener(`change`, (evt) => {
   const s = evt.target;
@@ -174,7 +174,7 @@ fetch(SOURCE)
 
     // Set up the hillshading function
     hillShade = () => runHillShade(width, height, pixels, normals, geoTags);
-  
+
     // And then hill-shade our image
     hillShade();
   });
@@ -182,10 +182,10 @@ fetch(SOURCE)
 // hill shader
 function runHillShade(width, height, pixels, normals, geoTags) {
   console.log(`running`);
-  
+
   cvs.width = cvs.height = w;
   ctx = cvs.getContext(`2d`);
-  
+
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
   const light = unit({ x: -100, y: 300, z: 10 });
 
@@ -227,6 +227,7 @@ function runHillShade(width, height, pixels, normals, geoTags) {
         shaded.data[i + 0] = lerp(r, F(n.x), e) | 0;
         shaded.data[i + 1] = lerp(r, F(n.y), e) | 0;
         shaded.data[i + 2] = lerp(r, F(n.z), e) | 0;
+        shaded.data[i + 3] = 100 < e && e < 150 ? 0 : 255;
       }
     }
   }
@@ -236,10 +237,11 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
-  
+
   ctx.globalCompositeOperation = "source-out";
   ctx.drawImage(bg, 0, 0, w, h);
 
   ctx.globalCompositeOperation = compositionStrategy;
+  ctx.filter = `opacity(0.8)`;
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
