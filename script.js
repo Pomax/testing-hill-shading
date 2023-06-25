@@ -124,11 +124,15 @@ function readPNG(pngPath, data) {
   // Convert scan lines into 16 bit pixels rows
   const bytes = new Uint8Array(width * height * 2);
   console.log(`reading ${bytes.length / 2} int16s`);
+  
+  // why is this seemingly not getting the right data in the browser?1
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       bytes[x + y * width] = imageData[1 + x + y*(width+1)];
     }
   }
+
+  // correct for array buffer endian-ness
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
   const gpos = indexOf(data, `tEXt`);
