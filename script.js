@@ -23,8 +23,11 @@ const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 const mag = (v) => sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
 const unit = (v, m = mag(v)) => ({ x: v.x / m, y: v.y / m, z: v.z / m });
 
-const reflect = (ray, normal) =>
-  unit(sub(muls(normal, (2 * dot(ray, normal)) / dot(normal, normal)), ray));
+const reflect = (ray, normal) => {
+  const f = (2 * dot(ray, normal)) / dot(normal, normal);
+  const s = muls(normal, f);
+  return sub(s, ray);
+};
 
 const lerp = (r, a, b) => (1 - r) * a + r * b;
 
@@ -173,9 +176,9 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrainMap(v, -1, 1, 0, 255) | 0
+  const F = (v) => constrainMap(v, -1, 1, 0, 255) | 0;
 
-  const light = { x: -100, y: -100, z: 10 };
+  const light = { x: -300, y: -300, z: 10 };
 
   // illuminate
   const drawPixels = false;
@@ -190,18 +193,18 @@ function hillShade(width, height, pixels, normals, geoTags) {
 
       // compute illumination for this pixel
       const r = reflect(light, n);
-      let e = (r.z * 100) | 0
-      histogram[e] = (histogram[e]??0) + 1;
+      let e = (r.z * 100) | 0;
+      histogram[e] = (histogram[e] ?? 0) + 1;
 
       e = F(r.z);
 
       // Update from pixel index to canvas RGBA offset
       i = 4 * i;
-      
+
       // Set alpha to opaque
       shaded.data[i + 3] = 255;
 
-      // Then draw some pixel data      
+      // Then draw some pixel data
       if (drawPixels) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
@@ -213,14 +216,14 @@ function hillShade(width, height, pixels, normals, geoTags) {
       }
 
       if (drawHill) {
-        shaded.data[i + 0] = e;
-        shaded.data[i + 1] = e;
-        shaded.data[i + 2] = e;
+        const r = 1;
+        shaded.data[i + 0] = lerp(r, F(n.x), e);
+        shaded.data[i + 1] = lerp(r, F(n.y), e);
+        shaded.data[i + 2] = lerp(r, F(n.z), e);
       }
-
     }
   }
-  
+
   console.table(histogram);
 
   let cvs2 = document.createElement(`canvas`);
