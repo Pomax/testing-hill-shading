@@ -23,11 +23,8 @@ const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 const mag = (v) => sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
 const unit = (v, m = mag(v)) => ({ x: v.x / m, y: v.y / m, z: v.z / m });
 
-const reflect = (ray, normal) => {
-  ray = unit(ray);
-  normal = unit(normal);
-  return unit(sub(muls(normal, 2 * dot(ray, normal)), ray));
-};
+const reflect = (ray, normal) =>
+  unit(sub(muls(normal, (2 * dot(ray, normal)) / dot(normal, normal)), ray));
 
 const lerp = (r, a, b) => (1 - r) * a + r * b;
 
@@ -172,32 +169,28 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const light = { x: -100, y: -100, z: 1 };
-  const f = reflect(light, { x: 0, y: 0, z: 1 });
+  const F = (v) => constrainMap(v, 0, 1, 0, 255);
 
   const B = 1;
   const blend = (a, b) => (1 - B) * a + B * b;
+  const light = { x: -100, y: -100, z: 10 };
 
-  const F = (v) => constrainMap(v, 0, 1, 0, 255);
-  
   // illuminate
+  const drawPixels = true;
+  const drawHill = true;
   const shaded = ctx.createImageData(width, height);
-  console.log(shaded.data.length / 4);
-  let i = 0;
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      i = x + y * width;
+      let i = x + y * width;
       const p = pixels[i];
       const n = normals[i];
-      i = 4 * i;
-
+      
       // compute illumination
-      let r1 = reflect(light, n);
-      const z1 = r1.z;
-      const e = F(z1);
+      const r1 = reflect(light, n);
+      const e = F(r1.z);
 
-      const drawPixels = false;
-      const drawHill = true;
+      // Update from pixel index to canvas RGBA offset
+      i = 4 * i;
 
       if (drawPixels) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
