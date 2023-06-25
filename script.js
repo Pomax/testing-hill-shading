@@ -173,7 +173,7 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrainMap(v, 0, 1, 0, 255) | 0
+  const F = (v) => constrainMap(v, -1, 1, 0, 255) | 0
 
   const light = { x: -100, y: -100, z: 10 };
 
@@ -190,8 +190,10 @@ function hillShade(width, height, pixels, normals, geoTags) {
 
       // compute illumination for this pixel
       const r = reflect(light, n);
+      let e = (r.z * 100) | 0
       histogram[e] = (histogram[e]??0) + 1;
-      const e = F(r.z);
+
+      e = F(r.z);
 
       // Update from pixel index to canvas RGBA offset
       i = 4 * i;
