@@ -173,27 +173,33 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrainMap(v, 0, 1, 50, 255);
+  const F = (v) => constrainMap(v, 0, 1, 0, 255) | 0
 
-  const light = { x: -100, y: -100, z: 1 };
+  const light = { x: -100, y: -100, z: 10 };
 
   // illuminate
-  const drawPixels = true;
+  const drawPixels = false;
   const drawHill = true;
   const shaded = ctx.createImageData(width, height);
+  const histogram = {};
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       let i = x + y * width;
       const p = pixels[i];
       const n = normals[i];
 
-      // compute illumination
-      const r1 = reflect(light, n);
-      const e = F(r1.z);
+      // compute illumination for this pixel
+      const r = reflect(light, n);
+      histogram[e] = (histogram[e]??0) + 1;
+      const e = F(r.z);
 
       // Update from pixel index to canvas RGBA offset
       i = 4 * i;
+      
+      // Set alpha to opaque
+      shaded.data[i + 3] = 255;
 
+      // Then draw some pixel data      
       if (drawPixels) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
@@ -210,9 +216,10 @@ function hillShade(width, height, pixels, normals, geoTags) {
         shaded.data[i + 2] = e;
       }
 
-      shaded.data[i + 3] = 255;
     }
   }
+  
+  console.table(histogram);
 
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = width;
