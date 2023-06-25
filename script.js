@@ -129,13 +129,15 @@ function readPNG(pngPath, data) {
   return { width, height, pixels, geoTags };
 }
 
+let normals = [];
+
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
     data = readPNG(SOURCE, data);
     const { height, width, pixels, geoTags } = data;
     // build normals
-    const normals = [];
+  x
     const getElevation = (x, y) => pixels[x + y * height];
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
@@ -143,11 +145,11 @@ fetch(SOURCE)
         const b = getElevation(x + 1, y);
         const c = getElevation(x, y - 1);
         const d = getElevation(x, y + 1);
-        const n = unit({ x: a - b, y: c - d, z: 2 });
+        const n = { x: a - b, y: c - d, z: 2 };
         normals.push(n);
       }
     }
-    hillShade({ offsetX: 0, offsetY: 0 }, width, height, normals);
+    hillShade({ offsetX: 0, offsetY: 0 }, width, height);
   });
 
 const bg = new Image();
@@ -155,7 +157,7 @@ bg.crossOrigin = `anonymous`;
 bg.src = BGSOURCE;
 
 // hill shader
-function hillShade(evt, wn, hn, normals) {
+function hillShade(evt, wn, hn) {
   
   ctx.filter = `blur(2px)`;
 
@@ -191,17 +193,17 @@ function hillShade(evt, wn, hn, normals) {
     w = wn;
     h = hn;
   } else {
-    normals = [];
-    for (let x = 0; x < w; x++) {
-      for (let y = 0; y < h; y++) {
-        const a = getElevation(x - 1, y);
-        const b = getElevation(x + 1, y);
-        const c = getElevation(x, y - 1);
-        const d = getElevation(x, y + 1);
-        const n = { x: a - b, y: c - d, z: 2 };
-        normals.push(n);
-      }
-    }
+    // normals = [];
+    // for (let x = 0; x < w; x++) {
+    //   for (let y = 0; y < h; y++) {
+    //     const a = getElevation(x - 1, y);
+    //     const b = getElevation(x + 1, y);
+    //     const c = getElevation(x, y - 1);
+    //     const d = getElevation(x, y + 1);
+    //     const n = { x: a - b, y: c - d, z: 2 };
+    //     normals.push(n);
+    //   }
+    // }
   }
 
   const B = 1;
@@ -212,7 +214,7 @@ function hillShade(evt, wn, hn, normals) {
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       let i = 4 * (x + y*w);
-      const n = normals[y + x*w];
+      const n = normals[x + y*w];
 
       // compute illumination
       let r1 = unit(reflect(light, n));
