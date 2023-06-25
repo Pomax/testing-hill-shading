@@ -42,6 +42,13 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
+const constrainMap = (v, s, e, m, M) => {
+  return constrain(map(v,s,e,m,M),m,M);
+};
+
+const F = (v) => constrainMap(v, 0, 1, 0, 255);
+
+
 // let compositionStrategy = `source-in`;
 // blendMode.addEventListener(`change`, (evt) => {
 //   const s = evt.target;
@@ -117,11 +124,14 @@ function readPNG(pngPath, data) {
   const imageData = pako.inflate(deflated);
   // Convert scan lines into pixels
   const bytes = new Uint8Array(width * height * 2);
+  console.log(`reading ${bytes.length/2} int16s`);
   for (let y = 0; y < height; y++) {
     // skip over the first byte, which is the scanline's filter type byte.
     const s = 1 + y * (width + 1);
     const slice = imageData.subarray(s, s + width);
-    bytes.set(slice, y * width);
+    for (let x = 0; x<width; x++) {
+      bytes[x + y*width] = slice[x], y * width);
+    }
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
@@ -141,10 +151,10 @@ fetch(SOURCE)
     data = readPNG(SOURCE, data);
     const { height, width, pixels, geoTags } = data;
     const getElevation = (x, y) => {
-      if (x<0) x = 0;
-      if (x>0) x = 0;
-      pixels[x + y * width];
-    }
+      x = constrain(x, 0, width - 1);
+      y = constrain(y, 0, height - 1);
+      return pixels[x + y * width];
+    };
     // build normals
     const normals = [];
     for (let x = 0; x < width; x++) {
@@ -162,22 +172,23 @@ fetch(SOURCE)
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrain(map(v, 0, 1, 0, 255), 0, 255);
 
   // const light = { x: -x, y: -y, z: 1 };
   // const f = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   // const flatValue = F(f.z);
 
-//   const B = 1;
-//   const blend = (a, b) => (1 - B) * a + B * b;
+  //   const B = 1;
+  //   const blend = (a, b) => (1 - B) * a + B * b;
 
   // illuminate
   const shaded = ctx.createImageData(width, height);
+  console.log(shaded.data.length / 4);
   let i = 0;
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      i = 4 * (x + y * width);
-      const n = normals[x + y * width];
+      i = (x + y * width);
+      const p = pixels[i];
+      const n = normals[i];
 
       //       // compute illumination
       //       let r1 = unit(reflect(light, n));
@@ -185,13 +196,15 @@ function hillShade(width, height, pixels, normals, geoTags) {
       //       const e = F(z1);
 
       // noise reduction using the alpha channel
-      shaded.data[i + 0] = F(n.x); // blend(F(n.x), e);
-      shaded.data[i + 1] = F(n.y); // blend(F(n.y), e);
-      shaded.data[i + 2] = F(n.z); // blend(F(n.z), e);
-      shaded.data[i + 3] = 255;
+      // shaded.data[i + 0] = F(n.x); // blend(F(n.x), e);
+      // shaded.data[i + 1] = F(n.y); // blend(F(n.y), e);
+      // shaded.data[i + 2] = F(n.z); // blend(F(n.z), e);
+      shaded.data[4*i + 0] = constrainMap(p,-500,9000,0,255) | 0;
+      shaded.data[4*i + 1] = constrainMap(p,-500,9000,0,255) | 0;
+      shaded.data[4*i + 2] = constrainMap(p,-500,9000,0,255) | 0;
+      shaded.data[4*i + 3] = 255;
     }
   }
-  console.log(i / 4);
 
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = width;
