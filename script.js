@@ -35,7 +35,7 @@ const constrain = (v, m, M) => {
   return v > M ? M : v < m ? m : v;
 };
 
-let compositionStrategy = `color-burn`;
+let compositionStrategy = `source-in`;
 blendMode.addEventListener(`change`, (evt) => {
   const s = evt.target;
   const v = s.options[s.selectedIndex].textContent;
@@ -187,7 +187,10 @@ function hillShade(evt, wn, hn, normals) {
   const flatValue = F(f.z);
 
   // build normals
-  if (!normals) {
+  if (normals) {
+    w = wn;
+    h = hn;
+  } else {
     normals = [];
     for (let x = 0; x < w; x++) {
       for (let y = 0; y < h; y++) {
@@ -195,19 +198,16 @@ function hillShade(evt, wn, hn, normals) {
         const b = getElevation(x + 1, y);
         const c = getElevation(x, y - 1);
         const d = getElevation(x, y + 1);
-        const n = unit({ x: a - b, y: c - d, z: 2 });
+        const n = { x: a - b, y: c - d, z: 2 };
         normals.push(n);
       }
     }
-  } else {
-    w = wn;
-    h = hn;
   }
 
   const B = 1;
   const blend = (a, b) => (1 - B) * a + B * b;
 
-  // illuminate~
+  // illuminate
   const shaded = ctx.createImageData(w, h);
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
