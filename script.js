@@ -145,6 +145,7 @@ function readPNG(pngPath, data) {
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
+    // Get height map
     data = readPNG(SOURCE, data);
     const { height, width, pixels, geoTags } = data;
     const getElevation = (x, y) => {
@@ -152,7 +153,8 @@ fetch(SOURCE)
       y = constrain(y, 0, height - 1);
       return pixels[x + y * width];
     };
-    // build normals
+
+    // Build normals
     const normals = [];
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
@@ -164,16 +166,16 @@ fetch(SOURCE)
         normals[x + y * width] = n;
       }
     }
+
+    // Hill-shade our image
     hillShade(width, height, pixels, normals, geoTags);
   });
 
 // hill shader
 function hillShade(width, height, pixels, normals, geoTags) {
-  const F = (v) => constrainMap(v, 0, 1, 0, 255);
+  const F = (v) => constrainMap(v, 0, 1, 50, 255);
 
-  const B = 1;
-  const blend = (a, b) => (1 - B) * a + B * b;
-  const light = { x: -100, y: -100, z: 10 };
+  const light = { x: -100, y: -100, z: 1 };
 
   // illuminate
   const drawPixels = true;
@@ -184,7 +186,7 @@ function hillShade(width, height, pixels, normals, geoTags) {
       let i = x + y * width;
       const p = pixels[i];
       const n = normals[i];
-      
+
       // compute illumination
       const r1 = reflect(light, n);
       const e = F(r1.z);
@@ -203,9 +205,9 @@ function hillShade(width, height, pixels, normals, geoTags) {
       }
 
       if (drawHill) {
-        shaded.data[i + 0] = blend(F(n.x), e);
-        shaded.data[i + 1] = blend(F(n.y), e);
-        shaded.data[i + 2] = blend(F(n.z), e);
+        shaded.data[i + 0] = e;
+        shaded.data[i + 1] = e;
+        shaded.data[i + 2] = e;
       }
 
       shaded.data[i + 3] = 255;
@@ -219,7 +221,3 @@ function hillShade(width, height, pixels, normals, geoTags) {
   ctx2.putImageData(shaded, 0, 0);
   ctx.drawImage(cvs2, 0, 0, w, h);
 }
-
-// cvs.addEventListener(`mousemove`, hillShade);
-// cvs.addEventListener(`mouseout`, () => hillShade());
-// hillShade();
