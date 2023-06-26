@@ -240,7 +240,19 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
+
+  ctx.filter = `blur(5px)`;
+  ctx.globalCompositeOperation = `color-burn`;
+  ctx.globalAlpha = 0.2;
   ctx.drawImage(cvs2, 0, 0, w, h);
+  ctx.globalAlpha = 1;
+
+  ctx.filter = `blur(0px)`;
+  ctx.globalCompositeOperation = `source-over`;
+  ctx.globalAlpha = 0.3;
+  ctx.drawImage(cvs2, 0, 0, w, h);
+  ctx.globalAlpha = 1;
+
   const shadeImage = ctx.getImageData(0, 0, w, h);
 
   for (let i = 0, e = ctxImage.data.length; i < e; i += 4) {
@@ -269,19 +281,19 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     // back to rgb
     const rgb = hslToRgb(...hsl);
 
-    if (e > 127) {
-      // ...
-    } else {
-      rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
-      rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
-      rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
-    }
+    // if (e > 127) {
+    //   // ...
+    // } else {
+    //   rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
+    //   rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
+    //   rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
+    // }
 
     
-    // and back into the data layer
-    shadeImage.data[i] = rgb[0];
-    shadeImage.data[i + 1] = rgb[1];
-    shadeImage.data[i + 2] = rgb[2];
+    // // and back into the data layer
+    // shadeImage.data[i] = rgb[0];
+    // shadeImage.data[i + 1] = rgb[1];
+    // shadeImage.data[i + 2] = rgb[2];
   }
   ctx.putImageData(shadeImage, 0, 0);
 }
