@@ -257,13 +257,13 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     // apply shading
     const e = shadeImage.data[i];
     if (e > 127) {
-      hsl[2] += constrainMap(e, 127, 255, 0, 20);
-      hsl[2] = constrain(hsl[2], 0, 100);
+      // hsl[2] += constrainMap(e, 127, 255, 0, 20);
+      // hsl[2] = constrain(hsl[2], 0, 100);
     } else {
       // hsl[0] -= constrainMap(e, 127, 0, 0, 20);
       // hsl[0] = (hsl[0] + 360) % 360;
-      hsl[2] += (e - 127)/3;
-      hsl[2] = constrain(hsl[2], 0, 100);
+      // hsl[2] += (e - 127)/3;
+      // hsl[2] = constrain(hsl[2], 0, 100);
     }
 
     // back to rgb
@@ -272,9 +272,9 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     if (e > 127) {
       // ...
     } else {
-      // rgb[0] = constrain(rgb[0] + (e - 127), 0, 255);
-      // rgb[1] = constrain(rgb[1] + (e - 127), 0, 255);
-      // rgb[2] = constrain(rgb[2] + (e - 127), 0, 255);
+      rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
+      rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
+      rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
     }
 
     
