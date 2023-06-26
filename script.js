@@ -260,12 +260,12 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     const e = shadeImage.data[i];
     if (e > 127) {
       // brighten using lightness
-      hsl[3] += constrainMap(e, 127, 255, 0, 100);
-      hsl[3] = constrain(hsl[3], 0, 100);      
+      hsl[2] += constrainMap(e, 127, 255, 0, 100);
+      hsl[2] = constrain(hsl[2], 0, 100);
     } else {
-      // brighten using lightness
-      hsl[2] += constrainMap(e, 127, 0, 0, 100);
-      hsl[2] = constrain(hsl[3], 0, 100);      
+      // darken using saturation
+      hsl[1] += constrainMap(e, 127, 0, 0, 100);
+      hsl[1] = constrain(hsl[1], 0, 360);
     }
        
     // back to rgb
