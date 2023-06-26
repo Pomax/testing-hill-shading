@@ -7,7 +7,6 @@ you're new to CSS they may seem a little complicated, but you can scroll down
 to this section's matching END comment to see page-specific styles.
 ******************************************************************************/
 
-
 /* 
   The style rules specify elements by type and by attributes such as class and ID
   Each section indicates an element or elements, then lists the style properties to apply
@@ -16,9 +15,9 @@ to this section's matching END comment to see page-specific styles.
 
 /* Our default values set as CSS variables */
 :root {
-  --color-bg: #69F7BE;
+  --color-bg: #69f7be;
   --color-text-main: #000000;
-  --color-primary: #FFFF00;
+  --color-primary: #ffff00;
   --wrapper-height: 87vh;
   --image-max-width: 300px;
   --image-margin: 3rem;
@@ -57,7 +56,7 @@ to this section's matching END comment to see page-specific styles.
   height: 2.75rem;
   align-items: center;
   cursor: pointer;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid #000000;
   box-sizing: border-box;
   border-radius: 4px;
@@ -70,7 +69,7 @@ to this section's matching END comment to see page-specific styles.
   margin-right: 0.5rem;
 }
 .btn--remix:hover {
-  background-color: #D0FFF1;
+  background-color: #d0fff1;
 }
 
 /* Navigation grid */
@@ -131,7 +130,7 @@ body {
 
 /* Very light scaling for our illustration */
 .title {
-  color: #2800FF;
+  color: #2800ff;
   font-family: HK Grotesk;
   font-style: normal;
   font-weight: bold;
@@ -157,7 +156,7 @@ button,
 input {
   font-family: inherit;
   font-size: 100%;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid #000000;
   box-sizing: border-box;
   border-radius: 4px;
@@ -167,7 +166,7 @@ input {
 
 /* Subheading */
 h2 {
-  color: #2800FF;
+  color: #2800ff;
 }
 
 /* Interactive image */
@@ -185,11 +184,16 @@ h2 {
 
 /* Links that open files in the editor */
 .fileopener {
-  cursor:pointer;
-  font-weight:bold;
-  border-bottom:3px solid var(--color-primary);
+  cursor: pointer;
+  font-weight: bold;
+  border-bottom: 3px solid var(--color-primary);
   color: var(--color-secondary);
 }
 .fileopener:hover {
-  border-bottom:3px solid var(--color-secondary);
+  border-bottom: 3px solid var(--color-secondary);
+}
+
+ul li img {
+  display: block;
+  max-height: 40vh;
 }
