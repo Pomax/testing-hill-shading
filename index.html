@@ -71,7 +71,7 @@
 
     <ul>
       <li>
-        We have a DEM height map:<br />
+        We have a 16 bit grayscale DEM height map:<br />
         <img
           style="max-height: 40vh"
           src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948"
@@ -105,16 +105,16 @@
       <li>
         And then we can recolour every pixel based on that value, with a frankly
         ridiculous amount of freedom in terms of what that means, so the above
-        image uses a two-pass approach, where we first "color-burn" the
+        image uses a two-pass approach, where we take the underlying map:
         underlying map:<br />
         <img
           src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793329687"
         />
-        which looks like this:
+        And then "color-burn" it with out shaded height data (after blurring it a little), which looks like this:
         <img
           src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/10d60317-542f-4daf-87c5-e844fd3cff81.image.png?v=1687808747831"
         />
-        Followed by a regular 70% transparent overlay of our illuminated heigh map, giving us that final image:
+        After which we add the shaded height map as a 70% transparent overlay to bring out the geographic features:
         <img src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ddc44d81-8f3d-4b9b-8507-ceb0f08c58da.image.png?v=1687808935412">
       </li>
     </ul>
