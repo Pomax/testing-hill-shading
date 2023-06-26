@@ -1,3 +1,5 @@
+import { toHSL } from "./color.js";
+
 const cvs = document.getElementById(`cvs`);
 const pako = globalThis.pako;
 
@@ -243,11 +245,26 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   ctx.drawImage(cvs2, 0, 0, w, h);
   const shadeImage = ctx.getImageData(0,0,w,h);
   
-  ctxImage.data.forEach((v,i) => {
-    if (i%4 !== 3) {
-      shadeImage.data[i] = (shadeImage.data[i] + v)/2;
-    }
-  });
+  for(let i=0, e=ctxImage.data.length; i<e; i++) {
+    // rgb
+    const pixel = [
+      ctxImage.data[i],
+      ctxImage.data[i+1],
+      ctxImage.data[i+2],
+    ]
+
+    // hsv
+    const hsl = toHSL(...pixel);
+    
+    // apply shading
+    
+    // back to rgb
+    shadeImage.data[i] = pixel[0];
+    shadeImage.data[i+1] = pixel[1];
+    shadeImage.data[i+2] = pixel[2];
+  }
   ctx.putImageData(shadeImage, 0, 0);
   
 }
+
+console.log(toHSL(120,180,200));
