@@ -263,7 +263,7 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     } else {
       // hsl[0] -= constrainMap(e, 127, 0, 0, 20);
       // hsl[0] = (hsl[0] + 360) % 360;
-      hsl[1] += constrainMap(e, 127, 0, 10, 30);
+      hsl[1] += constrainMap(e, 127, 0, 0, 20);
       hsl[1] = constrain(hsl[1], 0, 100);
       hsl[2] -= constrainMap(e, 127, 0, 0, 40);
       hsl[2] = constrain(hsl[2], 0, 100);
