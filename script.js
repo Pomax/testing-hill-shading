@@ -264,47 +264,47 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   ctx.drawImage(cvs2, 0, 0, w, h);
   ctx.globalAlpha = 1;
 
-  const shadeImage = ctx.getImageData(0, 0, w, h);
+//   const shadeImage = ctx.getImageData(0, 0, w, h);
 
-  for (let i = 0, e = ctxImage.data.length; i < e; i += 4) {
-    // rgb
-    const pixel = [
-      ctxImage.data[i],
-      ctxImage.data[i + 1],
-      ctxImage.data[i + 2],
-    ];
+//   for (let i = 0, e = ctxImage.data.length; i < e; i += 4) {
+//     // rgb
+//     const pixel = [
+//       ctxImage.data[i],
+//       ctxImage.data[i + 1],
+//       ctxImage.data[i + 2],
+//     ];
 
-    // hsl
-    const hsl = rgbToHsl(...pixel);
+//     // hsl
+//     const hsl = rgbToHsl(...pixel);
     
-    // apply shading
-    const e = shadeImage.data[i];
-    if (e > 127) {
-      // hsl[2] += constrainMap(e, 127, 255, 0, 20);
-      // hsl[2] = constrain(hsl[2], 0, 100);
-    } else {
-      // hsl[0] -= constrainMap(e, 127, 0, 0, 20);
-      // hsl[0] = (hsl[0] + 360) % 360;
-      // hsl[2] += (e - 127)/3;
-      // hsl[2] = constrain(hsl[2], 0, 100);
-    }
+//     // apply shading
+//     const e = shadeImage.data[i];
+//     if (e > 127) {
+//       // hsl[2] += constrainMap(e, 127, 255, 0, 20);
+//       // hsl[2] = constrain(hsl[2], 0, 100);
+//     } else {
+//       // hsl[0] -= constrainMap(e, 127, 0, 0, 20);
+//       // hsl[0] = (hsl[0] + 360) % 360;
+//       // hsl[2] += (e - 127)/3;
+//       // hsl[2] = constrain(hsl[2], 0, 100);
+//     }
 
-    // back to rgb
-    const rgb = hslToRgb(...hsl);
+//     // back to rgb
+//     const rgb = hslToRgb(...hsl);
 
-    // if (e > 127) {
-    //   // ...
-    // } else {
-    //   rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
-    //   rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
-    //   rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
-    // }
+//     // if (e > 127) {
+//     //   // ...
+//     // } else {
+//     //   rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
+//     //   rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
+//     //   rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
+//     // }
 
     
-    // // and back into the data layer
-    // shadeImage.data[i] = rgb[0];
-    // shadeImage.data[i + 1] = rgb[1];
-    // shadeImage.data[i + 2] = rgb[2];
-  }
-  ctx.putImageData(shadeImage, 0, 0);
+//     // // and back into the data layer
+//     // shadeImage.data[i] = rgb[0];
+//     // shadeImage.data[i + 1] = rgb[1];
+//     // shadeImage.data[i + 2] = rgb[2];
+//   }
+//   ctx.putImageData(shadeImage, 0, 0);
 }

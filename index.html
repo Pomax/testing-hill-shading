@@ -74,26 +74,26 @@
       <li>We have a DEM height map:<br>
         <img style="max-height: 40vh" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948"><br>
         ...super exciting, let's level that a little:<br>
-<img style="max-height: 40vh" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948">        
+<img style="max-height: 40vh" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687807910178">        
       </li>
       <li>
         We can compute the "surface normal" for each pixel by looking at its
         four direct neighbours, creating a vector {a-b,c-d,2} where "a" and "b"
         are the height at (x-1,y) and (x+1,y) respectively, and "c" and "d" are
-        the height at (x,y-1) and (x,y+1), respectively
+        the height at (x,y-1) and (x,y+1), respectively:<br>
+        <img style="max-height:40vh;" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ca49a69d-9691-4aa3-82fa-2f9d7cc13977.image.png?v=1687808057302">
       </li>
       <li>
-        We then check how much light would get reflected "up" into the screen,
-        if the light is coming from a direction that's tied to where your cursor
-        is on the image
+        We then compute how much light would get reflected "up" into the screen,
+        given an illumination vector, using the standard <a href="https://en.wikipedia.org/wiki/Reflection_(mathematics)">vector reflection</a> approach:<br>
+        <img src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/4ebb214e-ce20-4ced-a695-d5c55d79e79b.image.png?v=1687808402386" style="max-height: 40vh">
       </li>
       <li>
-        And then we can recolour every pixel with that value instead of its
-        original value
-      </li>
-      <li>
-        And make any pixel with a pure vertical normal transparent, because
-        there's nothing to colour there
+        And then we can recolour every pixel based on that value, with a frankly ridiculous amount of freedom in terms of what that means, so the above image uses a two-pass approach, where we first "color-burn" the underlying map:<br>
+        <img src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793329687" style="max-height:40vh"><br>
+        which looks like this:
+        <img src=""
+        Followed by a regular 70% transparent overlay.
       </li>
     </ul>
 
