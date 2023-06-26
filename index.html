@@ -31,10 +31,9 @@
   </head>
   <body>
     <h1>Let's test some hill shading</h1>
+    <!--
     <p>
       Move your mouse over the image to change the shading angle!
-
-      <!--
       <select id="blendMode">
         <option>source-over</option>
         <option>source-in</option>
@@ -72,7 +71,11 @@
     <p>How does this work?</p>
 
     <ul>
-      <li>We have a height map (the base image)</li>
+      <li>We have a DEM height map:<br>
+        <img style="max-height: 40vh" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948"><br>
+        ...super exciting, let's level that a little:<br>
+<img style="max-height: 40vh" src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948">        
+      </li>
       <li>
         We can compute the "surface normal" for each pixel by looking at its
         four direct neighbours, creating a vector {a-b,c-d,2} where "a" and "b"
