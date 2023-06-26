@@ -1,4 +1,4 @@
-import { toHSL } from "./color.js";
+import { rgbToHsl, hslToRgb } from "./color.js";
 
 const cvs = document.getElementById(`cvs`);
 const pako = globalThis.pako;
@@ -245,7 +245,7 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   ctx.drawImage(cvs2, 0, 0, w, h);
   const shadeImage = ctx.getImageData(0,0,w,h);
   
-  for(let i=0, e=ctxImage.data.length; i<e; i++) {
+  for(let i=0, e=ctxImage.data.length; i<e; i+=4) {
     // rgb
     const pixel = [
       ctxImage.data[i],
@@ -253,18 +253,29 @@ function runHillShade(width, height, pixels, normals, geoTags) {
       ctxImage.data[i+2],
     ]
 
-    // hsv
-    const hsl = toHSL(...pixel);
-    
+    // hsl
+    const hsl = rgbToHsl(...pixel);
+
     // apply shading
-    
+    const e = shadeImage.data[i];
+    if (e > 127) {
+      // brighten using lightness
+      hsl[3] += constrainMap(e, 127, 255, 0, 100);
+      hsl[3] = constrain(hsl[3], 0, 100);      
+    } else {
+      // brighten using lightness
+      hsl[2] += constrainMap(e, 127, 0, 0, 100);
+      hsl[2] = constrain(hsl[3], 0, 100);      
+    }
+       
     // back to rgb
-    shadeImage.data[i] = pixel[0];
-    shadeImage.data[i+1] = pixel[1];
-    shadeImage.data[i+2] = pixel[2];
+    const rgb = hslToRgb(...hsl);
+    
+    // and back into the data layer
+    shadeImage.data[i] = rgb[0];
+    shadeImage.data[i+1] = rgb[1];
+    shadeImage.data[i+2] = rgb[2];
   }
   ctx.putImageData(shadeImage, 0, 0);
   
 }
-
-console.log(toHSL(120,180,200));
