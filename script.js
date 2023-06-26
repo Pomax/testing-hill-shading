@@ -45,15 +45,15 @@ const constrainMap = (v, s, e, m, M) => {
 
 let hillShade = () => {};
 
-let compositionStrategy = `luminosity`;
-const blendMode = document.getElementById(`blendMode`);
-blendMode.addEventListener(`change`, (evt) => {
-  const s = evt.target;
-  const v = s.options[s.selectedIndex].textContent;
-  compositionStrategy = v;
-  console.log(v);
-  hillShade();
-});
+// let compositionStrategy = `luminosity`;
+// const blendMode = document.getElementById(`blendMode`);
+// blendMode.addEventListener(`change`, (evt) => {
+//   const s = evt.target;
+//   const v = s.options[s.selectedIndex].textContent;
+//   compositionStrategy = v;
+//   console.log(v);
+//   hillShade();
+// });
 
 let w = 800;
 let h = w;
@@ -186,7 +186,7 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   const ctxImage = ctx.getImageData(0, 0, w, h);
 
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
-  const light = unit({ x: -100, y: 300, z: 10 });
+  const light = unit({ x: -300, y: -300, z: 10 });
 
   // illuminate
   const drawPixels = false;
