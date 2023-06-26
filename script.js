@@ -1,4 +1,5 @@
 import { rgbToHsl, hslToRgb } from "./color.js";
+import { Conrec } from "./conrec.js";
 
 const cvs = document.getElementById(`cvs`);
 const pako = globalThis.pako;
@@ -156,18 +157,32 @@ fetch(SOURCE)
       return pixels[x + y * width];
     };
 
+    const conrecData = [];
+  
     // Build normals
+    const xs = [];
+    const ys = [];
     const normals = [];
     for (let x = 0; x < width; x++) {
+        xs.push(x);
       for (let y = 0; y < height; y++) {
+        ys.push(y);
         const a = getElevation(x - 1, y);
         const b = getElevation(x + 1, y);
         const c = getElevation(x, y - 1);
         const d = getElevation(x, y + 1);
         const n = unit({ x: a - b, y: c - d, z: 2 });
         normals[x + y * width] = n;
+        conrecData.push([x,y,getElevation(x,y)]);
       }
     }
+  
+    // experimental contours
+    const conrec = new Conrec();
+    const levels = [100,200,300,400,500,600,700,800,900,1000];
+    conrec.contour(conrecData,0,width,0,height,xs,ys, levels.length, levels);
+    const contours = conrec.contours;
+    console.log(contours);
 
     // Set up the hillshading function
     hillShade = () => runHillShade(width, height, pixels, normals, geoTags);
