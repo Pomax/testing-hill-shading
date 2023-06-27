@@ -13,7 +13,6 @@ import {
 } from "./js/utils.js";
 import { rgbToHsl, hslToRgb } from "./js/color.js";
 import { readPNG } from "./js/read-png.js";
-import { isoLines } from "./js/marchingsquares.js";
 
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
 
@@ -52,8 +51,6 @@ function createHillShader(data) {
   };
 
   // Build normals
-  const xs = [];
-  const ys = [];
   const normals = [];
   const elevation = { min: 0, max: 0 };
   for (let x = 0; x < width; x++) {
@@ -66,10 +63,6 @@ function createHillShader(data) {
       normals[x + y * width] = n;
     }
   }
-  
-  console.log(
-    isoLines
-  );
 
   // Set up the hillshading function
   return () => runHillShade(width, height, pixels, normals, geoTags);
