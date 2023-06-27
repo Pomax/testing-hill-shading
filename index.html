@@ -1,125 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-    <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
     <title>Hello (Hill-Shaded) World!</title>
-
-    <!-- The website stylesheet -->
     <link rel="stylesheet" href="/style.css" />
-    <style>
-      canvas {
-        max-height: 80vh;
-      }
-    </style>
-
-    <!-- The website JavaScript file -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="/script.js" type="module" async></script>
   </head>
   <body>
     <h1>Let's test some hill shading</h1>
-    <!--
+    
     <p>
-      Move your mouse over the image to change the shading angle!
-      <select id="blendMode">
-        <option>source-over</option>
-        <option>source-in</option>
-        <option>source-out</option>
-        <option>source-atop</option>
-        <option>destination-over</option>
-        <option>destination-in</option>
-        <option>destination-out</option>
-        <option>destination-atop</option>
-        <option>lighter</option>
-        <option>copy</option>
-        <option>xor</option>
-        <option>multiply</option>
-        <option>screen</option>
-        <option>overlay</option>
-        <option>darken</option>
-        <option>lighten</option>
-        <option>color-dodge</option>
-        <option>color-burn</option>
-        <option>hard-light</option>
-        <option>soft-light</option>
-        <option>difference</option>
-        <option>exclusion</option>
-        <option>hue</option>
-        <option>saturation</option>
-        <option>color</option>
-        <option selected="selected">luminosity</option>
-      </select>
+      Ever seen a google map with real terrain, instead of blobs?
     </p>
--->
 
     <canvas id="cvs"></canvas>
 
     <p>How does this work?</p>
 
-    <ul>
-      <li>
-        We have a 16 bit grayscale DEM height map:<br />
-        <img
-          style="max-height: 40vh"
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948"
-        />
-        ...super exciting, let's level that a little so you can actually see what data it captures:
-        <img
-          style="max-height: 40vh"
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687807910178"
-        />
-      </li>
-      <li>
-        We can compute the "surface normal" for each pixel by looking at its
-        four direct neighbours, creating a vector {a-b,c-d,2} where "a" and "b"
-        are the height at (x-1,y) and (x+1,y) respectively, and "c" and "d" are
-        the height at (x,y-1) and (x,y+1), respectively:
-        <img
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ca49a69d-9691-4aa3-82fa-2f9d7cc13977.image.png?v=1687808057302"
-        />
-      </li>
-      <li>
-        We then compute how much light would get reflected "up" into the screen,
-        given an illumination vector, using the standard
-        <a href="https://en.wikipedia.org/wiki/Reflection_(mathematics)"
-          >vector reflection</a
-        >
-        approach:
-        <img
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/4ebb214e-ce20-4ced-a695-d5c55d79e79b.image.png?v=1687808402386"
-        />
-      </li>
-      <li>
-        And then we can recolour every pixel based on that value, with a frankly
-        ridiculous amount of freedom in terms of what that means, so the above
-        image uses a two-pass approach, where we take the underlying map:
-        underlying map:<br />
-        <img
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793329687"
-        />
-        And then "color-burn" it with out shaded height data (after blurring it a little), which looks like this:
-        <img
-          src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/10d60317-542f-4daf-87c5-e844fd3cff81.image.png?v=1687808747831"
-        />
-        After which we add the shaded height map as a 70% transparent overlay to bring out the geographic features:
-        <img src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ddc44d81-8f3d-4b9b-8507-ceb0f08c58da.image.png?v=1687808935412">
-      </li>
-    </ul>
+    <p>We have a 16 bit grayscale DEM height map:</p>
 
-    <p></p>
+    <figure>
+      <img
+        style="max-height: 40vh"
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948"
+      />
+    </figure>
+
+    <p>
+      ...super exciting, let's level that a little so you can actually see what
+      data it captures:
+    </p>
+
+    <figure>
+      <img
+        style="max-height: 40vh"
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687807910178"
+      />
+    </figure>
+
+    <p>
+      We can compute the "surface normal" for each pixel by looking at its four
+      direct neighbours, creating a vector {a-b,c-d,2} where "a" and "b" are the
+      height at (x-1,y) and (x+1,y) respectively, and "c" and "d" are the height
+      at (x,y-1) and (x,y+1), respectively. If we normalize that vector and then
+      render it as if it were an {R,G,B} vector, that looks like:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ca49a69d-9691-4aa3-82fa-2f9d7cc13977.image.png?v=1687808057302"
+      />
+    </figure>
+
+    <p>
+      We then compute how much light would get reflected "up" into the screen,
+      given an illumination vector, using the standard
+      <a href="https://en.wikipedia.org/wiki/Reflection_(mathematics)"
+        >vector reflection</a
+      >
+      approach:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/4ebb214e-ce20-4ced-a695-d5c55d79e79b.image.png?v=1687808402386"
+      />
+    </figure>
+
+    <p>
+      And then we can recolour every pixel based on that value, with a frankly
+      ridiculous amount of freedom in terms of what that means, so the above
+      image uses a two-pass approach, where we take the underlying map:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793329687"
+      />
+    </figure>
+
+    <p>
+      And then "color-burn" it with our shaded height data, after blurring it a
+      little, to generate the general shading, which looks like this:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/10d60317-542f-4daf-87c5-e844fd3cff81.image.png?v=1687808747831"
+      />
+    </figure>
+
+    <p>
+      After which we add the shaded height map as a 70% transparent overlay,
+      without blurring, to bring out the geographic features without making
+      everything look jagged and terrible:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ddc44d81-8f3d-4b9b-8507-ceb0f08c58da.image.png?v=1687808935412"
+      />
+    </figure>
 
     <!-- The footer holds our remix button — you can keep or delete it ✂ -->
     <footer class="footer">

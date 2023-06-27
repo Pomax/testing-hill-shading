@@ -193,7 +193,11 @@ h2 {
   border-bottom: 3px solid var(--color-secondary);
 }
 
-ul li img {
+figure img {
   display: block;
   max-height: 40vh;
+}
+
+canvas {
+  max-height: 80vh;
 }
