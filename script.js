@@ -42,25 +42,23 @@ fetch(SOURCE)
   });
 
 function createHillShader(data) {
-  // Get height map
   data = readPNG(SOURCE, data);
   const { height, width, pixels, geoTags } = data;
+  
   const getElevation = (x, y) => {
     x = constrain(x, 0, width - 1);
     y = constrain(y, 0, height - 1);
     return pixels[x + y * width];
   };
-
+  
   const conrecData = [];
-
+  
   // Build normals
   const xs = [];
   const ys = [];
   const normals = [];
   for (let x = 0; x < width; x++) {
-    xs.push(x);
     for (let y = 0; y < height; y++) {
-      ys.push(y);
       const a = getElevation(x - 1, y);
       const b = getElevation(x + 1, y);
       const c = getElevation(x, y - 1);
@@ -71,17 +69,19 @@ function createHillShader(data) {
     }
   }
 
-  generateContourLines();
+  generateContourLines(conrecData, width, height);
 
 
   // Set up the hillshading function
   return () => runHillShade(width, height, pixels, normals, geoTags);
 }
 
-// experimental contours, if I can figure out CONREC
-function generateContourLines() {
+// experimental contours? It's generating NaN coordinates atm, which isn't great.
+function generateContourLines(conrecData, width, height) {
   const conrec = new Conrec();
   const levels = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+  const xs = [...new Array(width)].map((_,i) => i);
+  const ys = [...new Array(height)].map((_,i) => i);
   conrec.contour(
     conrecData,
     0,
@@ -94,7 +94,7 @@ function generateContourLines() {
     levels
   );
   const contours = conrec.contours;
-  console.log(contours);  
+  console.log(`contours:`, contours);  
 }
 
 // hill shader
@@ -152,6 +152,7 @@ function runHillShade(width, height, pixels, normals, geoTags) {
     }
   }
 
+  // Overlay the hill shading on a real map
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = width;
   cvs2.height = height;
