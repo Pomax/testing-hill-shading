@@ -3,6 +3,7 @@ import { Conrec } from "./conrec.js";
 
 const cvs = document.getElementById(`cvs`);
 const pako = globalThis.pako;
+let hillShade = () => {};
 
 const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948`;
 const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793283354`;
@@ -10,6 +11,7 @@ const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115
 const bg = new Image();
 bg.crossOrigin = `anonymous`;
 bg.src = BGSOURCE;
+bg.onload = hillShade;
 
 // plain math
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
@@ -44,7 +46,6 @@ const constrainMap = (v, s, e, m, M) => {
   return constrain(map(v, s, e, m, M), m, M);
 };
 
-let hillShade = () => {};
 
 // let compositionStrategy = `luminosity`;
 // const blendMode = document.getElementById(`blendMode`);
