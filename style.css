@@ -9,9 +9,10 @@ body {
   margin: -1.5em auto;
   position: sticky;
   top: 0;
-  border:1px solid black;
+  border:2px solid black;
   border-top: none;
   border-bottom: non;
+  box-shadow: 0 0 20px 0 black;
 }
 
 /******************************************************************************
@@ -180,10 +181,6 @@ input {
   transition: 500ms;
 }
 
-/* Subheading */
-h2 {
-  color: #2800ff;
-}
 
 /* Interactive image */
 .illustration:active {
@@ -212,6 +209,7 @@ h2 {
 figure img {
   display: block;
   max-height: 40vh;
+  border: 1px solid black;
 }
 
 canvas {
@@ -225,4 +223,10 @@ a:visited,
 a:active {
   color: #ff0bc2;
   font-weight: bold;
+}
+
+h1, h2, h3 {
+  display: inline-block;
+  border-bottom: 1px solid white;
+  margin: 1em 0 0.5em;
 }
