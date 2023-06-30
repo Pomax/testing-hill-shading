@@ -81,12 +81,24 @@
     </figure>
 
     <p>
-      We can also take our height map and, using the
+      So that covers the general shading, but there's not a lot of colour here
+      yet. Which makes for a pretty bad map.
+    </p>
+
+    <p>
+      We want a <em>nice</em> map, so let's make a coloring book: we can take
+      our height map and, using the
       <a href="https://en.wikipedia.org/wiki/Marching_squares"
         >Marching Squares</a
       >
-      algorithm, find all regions that have the same elevation (in brackets, so
-      we get "bands"):
+      algorithm, find all regions that have the same general elevation so that
+      we get lines that separate, for example, "everything between 100 feet and
+      200 feet".
+    </p>
+
+    <p>
+      We can run this with as many "bands" as we like, to get something that
+      looks like this:
     </p>
 
     <figure>
@@ -99,9 +111,17 @@
       And we can can then fill in the areas between these
       <a href="https://en.wikipedia.org/wiki/Contour_line">"isolines"</a> using
       some false color designed to look appropriate to the elevation we're
-      coloring in, so: green for low altitudes, brown (less/no vegetation) for
-      high altitudes, blue/white (snow) for really high altitudes:
+      coloring in:
     </p>
+
+    <ul>
+      <li>light green for low altitudes</li>
+      <li>darker green for slightly higher altitudes</li>
+      <li>brown for high altitudes with less/no vegetation, and</li>
+      <li>blue/white (snow) for really high altitudes</li>
+    </ul>
+
+    <p>Which gives us something that looks like this:</p>
 
     <figure>
       <img
@@ -110,13 +130,18 @@
     </figure>
 
     <p>
-      If we then make the iso lines themslves less pronounced, we can overlay
-      our "shaded" black and white image using the
+      And to be honest, this already kinda looks like a pretty nice 2D map. But,
+      we can do even better by mixing in our terrain shading:
+    </p>
+
+    <p>
+      If we make the iso lines themslves less pronounced (say, 80% transparent)
+      and we overlay our "shaded" black and white image using the
       <a href="https://en.wikipedia.org/wiki/Blend_modes#Dodge_and_burn"
         >color-burn</a
       >
-      method, (after blurring it a little), to generate the general, subtle
-      shading:
+      method, (after blurring it a little) to generate the general, subtle
+      shading, we get this:
     </p>
 
     <figure>
@@ -126,9 +151,9 @@
     </figure>
 
     <p>
-      After which we add the shaded height map as a 70% transparent overlay,
-      without blurring, to bring out the geographic features without making
-      everything look jagged and terrible:
+      If we then add the shaded height map as a 70% transparent overlay,
+      (without blurring this time), we can bring out the geographic features and
+      end up with a kick-ass looking 2D map:
     </p>
 
     <figure>
@@ -138,9 +163,10 @@
     </figure>
 
     <p>
-      If we then tie the illumination vector to where the cursor is on the
-      canvas, we can change the way the terrain gets lit simply by moving the
-      cursor around!
+      And then as final touch, of course, we can bring it back to the animated
+      graphics all the way at the top: we can tie the sun's vector to the
+      position of the cursor on the image, so that we can change the way the
+      terrain gets lit simply by moving the cursor around!
     </p>
 
     <!-- The footer holds our remix button — you can keep or delete it ✂ -->

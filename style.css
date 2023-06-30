@@ -1,7 +1,7 @@
 html {
   background: ##69f7be;
-  padding: 0!important;
-  margin: 0!important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 body {
   width: 900px;
@@ -9,7 +9,7 @@ body {
   margin: -1.5em auto;
   position: sticky;
   top: 0;
-  border:2px solid black;
+  border: 2px solid black;
   border-top: none;
   border-bottom: non;
   box-shadow: 0 0 20px 0 black;
@@ -181,7 +181,6 @@ input {
   transition: 500ms;
 }
 
-
 /* Interactive image */
 .illustration:active {
   transform: translateY(5px);
@@ -210,6 +209,11 @@ figure img {
   display: block;
   max-height: 40vh;
   border: 1px solid black;
+  box-shadow: 12px 12px 15px 0px #0000005e;
+}
+
+figure {
+  margin-bottom: 2em;
 }
 
 canvas {
@@ -225,7 +229,9 @@ a:active {
   font-weight: bold;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   display: inline-block;
   border-bottom: 1px solid white;
   margin: 1em 0 0.5em;
