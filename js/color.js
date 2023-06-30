@@ -52,7 +52,7 @@ function hue2rgb(p, q, t) {
  * @return  {Array}           The RGB representation
  */
 export function hslToRgb(h, s, l) {
-  (h/=360), (s/=100), (l/=100);
+  (h /= 360), (s /= 100), (l /= 100);
   var r, g, b;
 
   if (s == 0) {

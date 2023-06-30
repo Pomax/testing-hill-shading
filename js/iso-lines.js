@@ -1,17 +1,23 @@
+// how prominent should the isolines be, and which colour should they use?
 const OUTLINE_STROKE = 0.2;
-const OUTLINE_COLOR = [0,0,0];
+const OUTLINE_COLOR = [0, 0, 0];
 
-// seeded marching squares to find ISO lines
+/**
+ * This function takes a PNG pixel array, and a list of elevations, and
+ * returns a pixel array that has been recoloured using the `getColor`
+ * colour gradient function.
+ */
 export function generateMap({ height, width, pixels }, isoValues = []) {
   const newPixels = new Uint8ClampedArray(pixels.length * 4);
-
   isoValues.forEach((value) =>
     addISOLayer(pixels, newPixels, width, height, value)
   );
-
   return newPixels;
 }
 
+/**
+ * This function colours a single ISO band in-place.
+ */
 function addISOLayer(pixels, newPixels, width, height, threshold) {
   const c = getColor(threshold);
 
@@ -31,11 +37,17 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
 
       if (matchType !== 0) {
         newPixels[4 * i] =
-          matchType === 15 ? c[0] : clerp2(OUTLINE_STROKE, c[0], OUTLINE_COLOR[0]);
+          matchType === 15
+            ? c[0]
+            : clerp2(OUTLINE_STROKE, c[0], OUTLINE_COLOR[0]);
         newPixels[4 * i + 1] =
-          matchType === 15 ? c[1] : clerp2(OUTLINE_STROKE, c[1], OUTLINE_COLOR[1]);
+          matchType === 15
+            ? c[1]
+            : clerp2(OUTLINE_STROKE, c[1], OUTLINE_COLOR[1]);
         newPixels[4 * i + 2] =
-          matchType === 15 ? c[2] : clerp2(OUTLINE_STROKE, c[2], OUTLINE_COLOR[2]);
+          matchType === 15
+            ? c[2]
+            : clerp2(OUTLINE_STROKE, c[2], OUTLINE_COLOR[2]);
         newPixels[4 * i + 3] = 255;
       }
     }
@@ -44,25 +56,12 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
   return newPixels;
 }
 
+/**
+ * Generate a colour for a specific elevation, based on interpolating between
+ * different fixed values. For instance, the colour for 50' is midway between
+ * the two known colours at 1' and 100'.
+ */
 function getColor(elevation) {
-  // const entries = [
-  //   [-5000, [0, 0, 0]],
-  //   [-500, [0, 0, 0]],
-  //   [-10, [0, 0, 100]],
-  //   [-2, [0, 155, 100]],
-  //   [-1, [255, 255, 150]],
-  //   [1, [25, 200, 25]],
-  //   [100, [0, 200, 0]],
-  //   [300, [0, 100, 0]],
-  //   [500, [80, 50, 0]],
-  //   [1000, [160, 140, 110]],
-  //   [1500, [200, 225, 225]],
-  //   [1800, [200, 225, 255]],
-  //   [2000, [225, 225, 255]],
-  //   [2500, [255, 255, 255]],
-  //   [20000, [255, 255, 255]],
-  // ];
-
   const entries = [
     [-5000, [0, 0, 0]],
     [-500, [0, 0, 0]],
@@ -87,6 +86,9 @@ function getColor(elevation) {
   return clerp(r, e1[1], e2[1]);
 }
 
+/**
+ * Linear intERPolation function for RGB colours.
+ */
 function clerp(r, c1, c2) {
   return [
     clerp2(r, c1[0], c2[0]) | 0,
@@ -95,6 +97,11 @@ function clerp(r, c1, c2) {
   ];
 }
 
+/**
+ * "linear" interpolation between two (single channel)
+ * colour values, based on real world light.
+ * See https://www.youtube.com/watch?v=LKnqECcg6Gw for more on this.
+ */
 function clerp2(r, v1, v2) {
   return ((1 - r) * v1 ** 0.5 + r * v2 ** 0.5) ** 2;
 }

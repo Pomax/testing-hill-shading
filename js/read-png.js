@@ -19,7 +19,10 @@ import { indexOf } from "./utils.js";
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
 /**
- * read a 
+ * parse a byte array as a PNG, and return the width, height, pixel data,
+ * and if present, "GeoTags" text chunk. No standard PNG will have that
+ * last part, but the data that I'm working with over on the repo for
+ * https://github.com/Pomax/are-we-flying most definintely does.
  */
 export function readPNG(pngPath, data) {
   data = new Uint8Array(data);
@@ -36,14 +39,13 @@ export function readPNG(pngPath, data) {
   const bytes = new Uint8Array(width * height * 2);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width * 2; x++) {
-      // why is this seemingly not getting the right data in the browser?
       bytes[x + y * width * 2] = imageData[1 + x + y * (width * 2 + 1)];
     }
   }
   if (endian === LITTLE_ENDIAN) reverseEndian(bytes);
   const pixels = new Int16Array(bytes.buffer);
 
-  // Get the GeoTag data
+  // Get the GeoTag data,if there is any
   let geoTags;
   const gpos = indexOf(data, `tEXt`);
   if (gpos > -1) {
