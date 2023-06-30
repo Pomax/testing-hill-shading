@@ -44,15 +44,16 @@
 
     <p>
       Every pixel in this image isn't a "colour" so much as a height value,
-      where white pixels are "pretty heigh up!" and black pixels are effectively
+      where white pixels are "pretty high up!" and black pixels are effectively
       sea level (or, technically maybe even a little lower than that!)
     </p>
 
     <p>
-      In order to turn this, frankly, not very useful information into a good
-      looking 2D map, we can turn the height map into something that (to a
-      computer at least) looks like a 3D surface, so we can shine some light on
-      it and get something that looks, you know, like actual terrain.
+      In order to turn this (frankly) not very useful information into a good
+      looking 2D map, we can convert the height map into something that (to a
+      computer at least) looks like a 3D surface, so thast we can then shine
+      some light on it and get something that looks... you know... like actual
+      terrain.
     </p>
 
     <p></p>
@@ -72,8 +73,8 @@
     <p>
       If we then normalize that vector (i.e. scale it such that it has a total
       length of 1) and render it as an RGB vector (so, pretending that "x"
-      represents the pixel red value, "y" the green value, and "z" the blue
-      value) then we get this:
+      represents the pixel's red value, "y" the green value, and "z" the blue
+      value) we get this:
     </p>
 
     <figure>
@@ -110,8 +111,10 @@
         >Marching Squares</a
       >
       algorithm, find all regions that have the same general elevation so that
-      we get lines that separate, for example, "everything between 100 feet and
-      200 feet".
+      we get lines that separate different altitudes. For example, if we picked
+      a 100 foot spacing, we can get one line that serpates "everything between
+      100 feet and 200 feet", another for "everything between 200 feet and 300
+      feet", and so on.
     </p>
 
     <p>
@@ -149,7 +152,7 @@
 
     <p>
       And to be honest, this already kinda looks like a pretty nice 2D map. But,
-      we can do even better by mixing in our terrain shading:
+      we can do even better by mixing in our terrain shading...
     </p>
 
     <p>
@@ -167,14 +170,12 @@
         src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/5f62ae82-a8e5-442d-8b17-cd8c5ef1baf0.image.png?v=1688154522358"
       />
     </figure>
-    
-    <p>
-      That might look a little fuzzy, but we're not quite done yet.
-    </p>
+
+    <p>That might look a little fuzzy, but we're not quite done yet.</p>
 
     <p>
-      We can then add the shaded height map as a 70% transparent overlay,
-      (without blurring this time), we can bring out the geographic features and
+      If we add the shaded height map as a 70% transparent overlay to the previous
+      view (without blurring this time), we can both highlight and "crisp up"bring out the geographic features and
       end up with a kick-ass looking 2D map!
     </p>
 

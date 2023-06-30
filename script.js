@@ -177,7 +177,9 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
 }
 
 /**
- * 
+ * The iso map function generates the coloring that makes our map actually
+ * look like a map, by generating a bunch of isoline surfaces and "flood fill"
+ * coloring each of those, based on the corresponding elevation.
  */
 function drawIsoMap() {
   ctx.globalAlpha = 1;
