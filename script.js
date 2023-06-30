@@ -42,7 +42,6 @@ cvs.addEventListener(`mousemove`, (evt) => {
   drawIsoMap();
 });
 
-
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
   .then((data) => {
@@ -92,7 +91,7 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
     ctx.drawImage(bg, 0, 0, w, h);
   }
 
-  // First off, we need a light source, which is really just "a vector" that we can 
+  // First off, we need a light source, which is really just "a vector" that we can
   // reflect over our normals to determine how much light will end up going straight
   // up, because that's the only thing we really care about here:
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
@@ -104,32 +103,34 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
 
   // We also want to know what RGB value corresponds to a perfectly flat surface, so
   // that we can "ignore" those later on (by rendering them as 100% transparent).
-  const flat = unit(reflect(light, {x:0, y:0, z:1}));
+  const flat = unit(reflect(light, { x: 0, y: 0, z: 1 }));
   const flatValue = constrainMap(flat.z ** 0.1, 0, 1, 0, 255);
-  
-  // illuminate
+
+  // Then we perform the illunation trick!
   const drawPixels = false;
   const drawHill = true;
   const shaded = ctx.createImageData(width, height);
-  const histogram = {};
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       let i = x + y * width;
       const p = pixels[i];
       const n = normals[i];
 
-      // Compute illumination for this pixel with some
+      // We compute the illumination for this pixel, with some
       // non-linear scaling to make the terrain "pop".
       const r = unit(reflect(light, n));
       const e = constrainMap(r.z ** 0.1, 0, 1, 0, 255);
 
-      // Update the pixel index to a canvas RGBA offset
+      // Also, the Canvas pixel array is actually four elements per pixel,
+      // since it encodes the R, G, B, and transparency (alpha) channels
+      // separately, so we need to update the pixel index from "just a normal
+      // array index" to a canvas RGBA offset:
       i = 4 * i;
 
-      // Set alpha to opaque
+      // And then step 1: set alpha to fully opaque
       shaded.data[i + 3] = 255;
 
-      // Then draw some pixel data
+      // Then, if we're debugging, draw some pixel data
       if (drawPixels) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
@@ -140,6 +141,8 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
         shaded.data[i + 2] = F(n.z) | 0;
       }
 
+      // But if we're NOT debugging, draw our terrain pixel, now that
+      // it's been illuminated by "the sun"
       if (drawHill) {
         const r = 1;
         shaded.data[i + 0] = lerp(r, F(n.x), e) | 0;
@@ -150,19 +153,22 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
     }
   }
 
-  // Overlay the hill shading on a real map
+  // We then overlay the hill shading:
   let cvs2 = document.createElement(`canvas`);
   cvs2.width = width;
   cvs2.height = height;
   let ctx2 = cvs2.getContext(`2d`);
   ctx2.putImageData(shaded, 0, 0);
 
+  // First as a general shading layer, using the "color burn" overlay mode
   ctx.filter = `blur(3px)`;
   ctx.globalCompositeOperation = `color-burn`;
   ctx.globalAlpha = 0.2;
   ctx.drawImage(cvs2, 0, 0, w, h);
   ctx.globalAlpha = 1;
 
+  // And then as "the real layer" using "source-over", which is a fancy
+  // way of saying "just draw the thing":
   ctx.filter = `blur(0px)`;
   ctx.globalCompositeOperation = `source-over`;
   ctx.globalAlpha = 0.3;
@@ -170,9 +176,8 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
   ctx.globalAlpha = 1;
 }
 
-
 /**
- * ...
+ * 
  */
 function drawIsoMap() {
   ctx.globalAlpha = 1;
