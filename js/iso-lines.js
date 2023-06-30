@@ -1,3 +1,6 @@
+const OUTLINE_STROKE = 0.5;
+const OUTLINE_COLOR = [0,0,0];
+
 // seeded marching squares to find ISO lines
 export function generateMap({ height, width, pixels }, isoValues = []) {
   const newPixels = new Uint8ClampedArray(pixels.length * 4);
@@ -10,7 +13,6 @@ export function generateMap({ height, width, pixels }, isoValues = []) {
 }
 
 function addISOLayer(pixels, newPixels, width, height, threshold) {
-  const OUTLINE_STROKE = 0.1;
   const c = getColor(threshold);
 
   for (let y = 0; y < height - 1; y++) {
@@ -29,11 +31,11 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
 
       if (matchType !== 0) {
         newPixels[4 * i] =
-          matchType === 15 ? c[0] : clerp2(OUTLINE_STROKE, c[0], 0);
+          matchType === 15 ? c[0] : clerp2(OUTLINE_STROKE, c[0], OUTLINE_COLOR[0]);
         newPixels[4 * i + 1] =
-          matchType === 15 ? c[1] : clerp2(OUTLINE_STROKE, c[1], 0);
+          matchType === 15 ? c[1] : clerp2(OUTLINE_STROKE, c[1], OUTLINE_COLOR[1]);
         newPixels[4 * i + 2] =
-          matchType === 15 ? c[2] : clerp2(OUTLINE_STROKE, c[2], 0);
+          matchType === 15 ? c[2] : clerp2(OUTLINE_STROKE, c[2], OUTLINE_COLOR[2]);
         newPixels[4 * i + 3] = 255;
       }
       //   newPixels[4 * i + 3] = matchType === 0 ? 0 : 255;
@@ -44,19 +46,38 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
 }
 
 function getColor(elevation) {
+  // const entries = [
+  //   [-5000, [0, 0, 0]],
+  //   [-500, [0, 0, 0]],
+  //   [-10, [0, 0, 100]],
+  //   [-2, [0, 155, 100]],
+  //   [-1, [255, 255, 150]],
+  //   [1, [25, 200, 25]],
+  //   [100, [0, 200, 0]],
+  //   [300, [0, 100, 0]],
+  //   [500, [80, 50, 0]],
+  //   [1000, [160, 140, 110]],
+  //   [1500, [200, 225, 225]],
+  //   [1800, [200, 225, 255]],
+  //   [2000, [225, 225, 255]],
+  //   [2500, [255, 255, 255]],
+  //   [20000, [255, 255, 255]],
+  // ];
+
   const entries = [
     [-5000, [0, 0, 0]],
     [-500, [0, 0, 0]],
-    [-10, [0, 0, 100]],
-    [-2, [0, 155, 100]],
-    [-1, [255, 255, 150]],
-    [1, [25, 200, 25]],
-    [100, [0, 200, 0]],
-    [300, [0, 100, 0]],
-    [500, [80, 50, 0]],
-    [1000, [160, 140, 110]],
-    [1500, [200, 225, 255]],
-    [2000, [225, 255, 255]],
+    [-10, [0, 0, 135]],
+    [-2, [0, 175, 115]],
+    [-1, [255, 255, 120]],
+    [1, [25, 215, 25]],
+    [100, [0, 215, 0]],
+    [300, [0, 125, 0]],
+    [500, [110, 65, 0]],
+    [1000, [175, 155, 120]],
+    [1500, [200, 230, 230]],
+    [1800, [200, 230, 255]],
+    [2000, [230, 230, 255]],
     [2500, [255, 255, 255]],
     [20000, [255, 255, 255]],
   ];

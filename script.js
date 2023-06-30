@@ -39,7 +39,7 @@ cvs.addEventListener(`mousemove`, (evt) => {
   mouseY = (evt.offsetY - h / 2) / h;
 
   ctx.globalAlpha = 1;
-  ctx.fillStyle = `skyblue`;
+  ctx.fillStyle = `#0FE`;
   ctx.fillRect(0, 0, w, h);
 
   const SCALE = 10;
