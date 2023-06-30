@@ -196,9 +196,8 @@ function drawIsoMap() {
   cvs.height = pxl.height;
   const pctx = cvs.getContext(`2d`);
   pctx.putImageData(pxl, 0, 0);
-  const ox = 0; // mouseX * SCALE * i ** 0.5;
-  const oy = 0; // mouseY * SCALE * i ** 0.5;
-  ctx.drawImage(cvs, ox, oy, w, h);
+  ctx.drawImage(cvs, 0, 0 , w, h);
 
+  // then draw our shaded terrain on top of this
   hillShade(OVERLAY_ONLY);
 }

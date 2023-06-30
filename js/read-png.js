@@ -1,10 +1,26 @@
+// This is a surprisingly simple bit of JS for parsing PNG files,
+// although they do need to follow a few rules: they shouldn't use
+// any special pixel filtering, and there should be a single IDAT 
+// chunk of pixel data.
+
+// This is a browser based gzip deflate implementation, which we'll need
+// for as long as browsers don't have a Compression object to work with.
+// Which you'd think had been include decades ago, given that browsers
+// already have libraries linked in for all kinds of data compression and
+// decompression, especially given the modern web with server-side compression.
+const pako = globalThis.pako;
+
+// We'll need to know which "endian" encoding this computer uses, because
+// that's just ridiculously important....
+// See https://en.wikipedia.org/wiki/Endianness for all the details here.
 import { LITTLE_ENDIAN, BIG_ENDIAN, endian, reverseEndian } from "./endian.js";
 import { indexOf } from "./utils.js";
 
-const pako = globalThis.pako;
-
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
+/**
+ * read a 
+ */
 export function readPNG(pngPath, data) {
   data = new Uint8Array(data);
 
