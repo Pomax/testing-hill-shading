@@ -5,7 +5,6 @@ const pako = globalThis.pako;
 
 const from4b = (b) => (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
 
-
 export function readPNG(pngPath, data) {
   data = new Uint8Array(data);
 
@@ -29,13 +28,16 @@ export function readPNG(pngPath, data) {
   const pixels = new Int16Array(bytes.buffer);
 
   // Get the GeoTag data
+  let geoTags;
   const gpos = indexOf(data, `tEXt`);
-  const bts = data.subarray(gpos - 4, gpos);
-  const glen = from4b(bts);
-  const json = new TextDecoder().decode(
-    data.subarray(indexOf(data, `GeoTags`) + 8, gpos + 4 + glen)
-  );
-  const geoTags = JSON.parse(json.toString());
+  if (gpos > -1) {
+    const bts = data.subarray(gpos - 4, gpos);
+    const glen = from4b(bts);
+    const json = new TextDecoder().decode(
+      data.subarray(indexOf(data, `GeoTags`) + 8, gpos + 4 + glen)
+    );
+    geoTags = JSON.parse(json.toString());
+  }
 
   // we're done.
   return { width, height, pixels, geoTags };

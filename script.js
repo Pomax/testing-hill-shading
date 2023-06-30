@@ -13,21 +13,53 @@ import {
 } from "./js/utils.js";
 import { rgbToHsl, hslToRgb } from "./js/color.js";
 import { readPNG } from "./js/read-png.js";
+import { generateMap } from "./js/iso-lines.js";
 
 const { abs, sin, cos, atan2, PI, log, sqrt, sign } = Math;
+const OVERLAY_ONLY = Symbol();
 
+let png;
+let isoMap;
 let hillShade = () => {};
+
+const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
+const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
 const bg = new Image();
-
-const cvs = document.getElementById(`cvs`);
-
-const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.900m.png?v=1687792965948`;
-const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793283354`;
 
 let w = 800;
 let h = w;
+const cvs = document.getElementById(`cvs`);
 cvs.width = cvs.height = w;
 let ctx = cvs.getContext(`2d`);
+
+let mouseX = 0;
+let mouseY = 0;
+cvs.addEventListener(`mousemove`, (evt) => {
+  mouseX = (evt.offsetX - w / 2) / w;
+  mouseY = (evt.offsetY - h / 2) / h;
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = `skyblue`;
+  ctx.fillRect(0, 0, w, h);
+
+  const SCALE = 10;
+  const lines = [...new Array(25)].map((_, i) => i * 100);
+  isoMap ??= generateMap(png, lines);
+
+  const pxl = new ImageData(isoMap, png.width, png.height);
+  const cvs = document.createElement(`canvas`);
+  cvs.width = pxl.width;
+  cvs.height = pxl.height;
+  const pctx = cvs.getContext(`2d`);
+  pctx.putImageData(pxl, 0, 0);
+  const ox = 0; // mouseX * SCALE * i ** 0.5;
+  const oy = 0; // mouseY * SCALE * i ** 0.5;
+  ctx.drawImage(cvs, ox, oy, w, h);
+
+  hillShade(OVERLAY_ONLY);
+});
+
+cvs.addEventListener(`mouseout`, (evt) => hillShade());
 
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
@@ -35,14 +67,14 @@ fetch(SOURCE)
     bg.crossOrigin = `anonymous`;
     bg.src = BGSOURCE;
     bg.onload = () => {
-      hillShade = createHillShader(data);
+      png = readPNG(SOURCE, data);
+      hillShade = createHillShader();
       hillShade();
     };
   });
 
-function createHillShader(data) {
-  data = readPNG(SOURCE, data);
-  const { height, width, pixels, geoTags } = data;
+function createHillShader() {
+  const { height, width, pixels, geoTags } = png;
 
   const getElevation = (x, y) => {
     x = constrain(x, 0, width - 1);
@@ -65,16 +97,18 @@ function createHillShader(data) {
   }
 
   // Set up the hillshading function
-  return () => runHillShade(width, height, pixels, normals, geoTags);
+  return (mode) => runHillShade(width, height, pixels, normals, geoTags, mode);
 }
 
 // hill shader
-function runHillShade(width, height, pixels, normals, geoTags) {
+function runHillShade(width, height, pixels, normals, geoTags, mode) {
   console.log(`running`);
 
-  cvs.width = cvs.height = w;
-  ctx = cvs.getContext(`2d`);
-  ctx.drawImage(bg, 0, 0, w, h);
+  if (mode !== OVERLAY_ONLY) {
+    cvs.width = cvs.height = w;
+    ctx = cvs.getContext(`2d`);
+    ctx.drawImage(bg, 0, 0, w, h);
+  }
   const ctxImage = ctx.getImageData(0, 0, w, h);
 
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
@@ -141,51 +175,4 @@ function runHillShade(width, height, pixels, normals, geoTags) {
   ctx.globalAlpha = 0.3;
   ctx.drawImage(cvs2, 0, 0, w, h);
   ctx.globalAlpha = 1;
-
-  // runCustomOverlay(ctx, ctxImage, w, h);
-}
-
-function runCustomOverlay(ctx, ctxImage, w, h) {
-  const shadeImage = ctx.getImageData(0, 0, w, h);
-
-  for (let i = 0, e = ctxImage.data.length; i < e; i += 4) {
-    // rgb
-    const pixel = [
-      ctxImage.data[i],
-      ctxImage.data[i + 1],
-      ctxImage.data[i + 2],
-    ];
-
-    // hsl
-    const hsl = rgbToHsl(...pixel);
-
-    // apply shading
-    const e = shadeImage.data[i];
-    if (e > 127) {
-      // hsl[2] += constrainMap(e, 127, 255, 0, 20);
-      // hsl[2] = constrain(hsl[2], 0, 100);
-    } else {
-      // hsl[0] -= constrainMap(e, 127, 0, 0, 20);
-      // hsl[0] = (hsl[0] + 360) % 360;
-      // hsl[2] += (e - 127)/3;
-      // hsl[2] = constrain(hsl[2], 0, 100);
-    }
-
-    // back to rgb
-    const rgb = hslToRgb(...hsl);
-
-    // if (e > 127) {
-    //   // ...
-    // } else {
-    //   rgb[0] = constrain((rgb[0] + e)/2, 0, 255);
-    //   rgb[1] = constrain((rgb[1] + e)/2, 0, 255);
-    //   rgb[2] = constrain((rgb[2] + e)/2, 0, 255);
-    // }
-
-    // // and back into the data layer
-    // shadeImage.data[i] = rgb[0];
-    // shadeImage.data[i + 1] = rgb[1];
-    // shadeImage.data[i + 2] = rgb[2];
-  }
-  ctx.putImageData(shadeImage, 0, 0);
 }
