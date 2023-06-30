@@ -117,6 +117,9 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
     z: 10,
   });
 
+  const flat = unit(reflect(light, {x:0, y:0, z:1}));
+  const flatValue = constrainMap(flat.z ** 0.1, 0, 1, 0, 255);
+  
   // illuminate
   const drawPixels = false;
   const drawHill = true;
@@ -155,7 +158,7 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
         shaded.data[i + 0] = lerp(r, F(n.x), e) | 0;
         shaded.data[i + 1] = lerp(r, F(n.y), e) | 0;
         shaded.data[i + 2] = lerp(r, F(n.z), e) | 0;
-        shaded.data[i + 3] = 100 < e && e < 150 ? 0 : 255;
+        shaded.data[i + 3] = e === flatValue ? 0 : 255;
       }
     }
   }

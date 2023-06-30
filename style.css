@@ -1,3 +1,19 @@
+html {
+  background: ##69f7be;
+  padding: 0!important;
+  margin: 0!important;
+}
+body {
+  width: 900px;
+  padding: 1em;
+  margin: -1.5em auto;
+  position: sticky;
+  top: 0;
+  border:1px solid black;
+  border-top: none;
+  border-bottom: non;
+}
+
 /******************************************************************************
 START Glitch hello-app default styles
 
@@ -83,7 +99,7 @@ to this section's matching END comment to see page-specific styles.
 }
 
 .footer a:not(.btn--remix):link,
-a:not(.btn--remix):visited {
+.footer a:not(.btn--remix):visited {
   font-family: HK Grotesk;
   font-style: normal;
   font-weight: normal;
@@ -201,4 +217,12 @@ figure img {
 canvas {
   max-height: 80vh;
   border: 1px solid black;
+}
+
+a,
+a:hover,
+a:visited,
+a:active {
+  color: #ff0bc2;
+  font-weight: bold;
 }
