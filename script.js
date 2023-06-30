@@ -26,12 +26,14 @@ const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/A
 const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
 const bg = new Image();
 
+// Let's set up the main canvas using nicely big dimensions
 let w = 800;
 let h = w;
 const cvs = document.getElementById(`cvs`);
 cvs.width = cvs.height = w;
 let ctx = cvs.getContext(`2d`);
 
+// As well as set up our cursor handling
 let mouseX = -0.5;
 let mouseY = -0.5;
 cvs.addEventListener(`mousemove`, (evt) => {
@@ -39,28 +41,6 @@ cvs.addEventListener(`mousemove`, (evt) => {
   mouseY = (evt.offsetY - h / 2) / h;
   drawIsoMap();
 });
-
-function drawIsoMap() {
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = `#0FE`;
-  ctx.fillRect(0, 0, w, h);
-
-  const SCALE = 10;
-  const lines = [...new Array(25)].map((_, i) => i * 100);
-  isoMap ??= generateMap(png, lines);
-
-  const pxl = new ImageData(isoMap, png.width, png.height);
-  const cvs = document.createElement(`canvas`);
-  cvs.width = pxl.width;
-  cvs.height = pxl.height;
-  const pctx = cvs.getContext(`2d`);
-  pctx.putImageData(pxl, 0, 0);
-  const ox = 0; // mouseX * SCALE * i ** 0.5;
-  const oy = 0; // mouseY * SCALE * i ** 0.5;
-  ctx.drawImage(cvs, ox, oy, w, h);
-
-  hillShade(OVERLAY_ONLY);
-}
 
 
 fetch(SOURCE)
@@ -102,7 +82,9 @@ function createHillShader() {
   return (mode) => runHillShade(width, height, pixels, normals, geoTags, mode);
 }
 
-// hill shader
+/**
+ * The hill shading code is fairly "text book", but of course text books can be hard to read
+ */
 function runHillShade(width, height, pixels, normals, geoTags, mode) {
   if (mode !== OVERLAY_ONLY) {
     cvs.width = cvs.height = w;
@@ -181,4 +163,30 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
   ctx.globalAlpha = 0.3;
   ctx.drawImage(cvs2, 0, 0, w, h);
   ctx.globalAlpha = 1;
+}
+
+
+/**
+ * ...
+ */
+function drawIsoMap() {
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = `#0FE`;
+  ctx.fillRect(0, 0, w, h);
+
+  const SCALE = 10;
+  const lines = [...new Array(25)].map((_, i) => i * 100);
+  isoMap ??= generateMap(png, lines);
+
+  const pxl = new ImageData(isoMap, png.width, png.height);
+  const cvs = document.createElement(`canvas`);
+  cvs.width = pxl.width;
+  cvs.height = pxl.height;
+  const pctx = cvs.getContext(`2d`);
+  pctx.putImageData(pxl, 0, 0);
+  const ox = 0; // mouseX * SCALE * i ** 0.5;
+  const oy = 0; // mouseY * SCALE * i ** 0.5;
+  ctx.drawImage(cvs, ox, oy, w, h);
+
+  hillShade(OVERLAY_ONLY);
 }

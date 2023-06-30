@@ -1,11 +1,11 @@
 html {
-  background: ##69f7be;
+  background: #69f7be;
   padding: 0 !important;
   margin: 0 !important;
 }
 body {
   width: 900px;
-  padding: 1em;
+  padding: 1em 2em;
   margin: -1.5em auto;
   position: sticky;
   top: 0;
