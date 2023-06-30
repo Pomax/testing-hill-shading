@@ -11,7 +11,6 @@ import {
   constrainMap,
   indexOf,
 } from "./js/utils.js";
-import { rgbToHsl, hslToRgb } from "./js/color.js";
 import { readPNG } from "./js/read-png.js";
 import { generateMap } from "./js/iso-lines.js";
 

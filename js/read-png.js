@@ -1,6 +1,6 @@
 // This is a surprisingly simple bit of JS for parsing PNG files,
 // although they do need to follow a few rules: they shouldn't use
-// any special pixel filtering, and there should be a single IDAT 
+// any special pixel filtering, and there should be a single IDAT
 // chunk of pixel data.
 
 // This is a browser based gzip deflate implementation, which we'll need
