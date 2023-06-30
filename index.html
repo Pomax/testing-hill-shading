@@ -11,9 +11,10 @@
   </head>
   <body>
     <h1>Let's test some hill shading</h1>
-    
+
     <p>
-      Ever seen a map that changes shading? Move your cursor or tap anywhere in the map below to change the sun's position!
+      Ever seen a map that changes shading? Move your cursor or tap anywhere in
+      the map below to change the sun's position!
     </p>
 
     <canvas id="cvs"></canvas>
@@ -71,9 +72,13 @@
     </figure>
 
     <p>
-      We can also take our height map and, using the <a href="">Marching Squares</a> algorith, find all regions that have the same elevation (bracketed to 100 foot bands):
+      We can also take our height map and, using the
+      <a href="https://en.wikipedia.org/wiki/Marching_squares"
+        >Marching Squares</a
+      >
+      algorithm, find all regions that have the same elevation (in brackets, so
+      we get "bands"):
     </p>
-    
 
     <figure>
       <img
@@ -82,13 +87,27 @@
     </figure>
 
     <p>
-      And then "color-burn" it with our shaded height data, after blurring it a
-      little, to generate the general shading, which looks like this:
+      And we can can then "flood fill" the areas between these "iso lines" using
+      some false color designed to look appropriate to the elevation we're
+      coloring in, so: green for low altitudes, brown (less/no vegetation) for
+      high altitudes, blue/white (snow) for really high altitudes:
     </p>
 
     <figure>
       <img
-        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/10d60317-542f-4daf-87c5-e844fd3cff81.image.png?v=1687808747831"
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/6a6ce669-97d4-46ed-9e44-4be3dea6899f.image.png?v=1688153947136"
+      />
+    </figure>
+
+    <p>
+      If we then make the iso lines themslves less pronounced, we can overlay
+      our "shaded" black and white image using the "color-burn" method, (after
+      blurring it a little), to generate the general, subtle shading:
+    </p>
+
+    <figure>
+      <img
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/5f62ae82-a8e5-442d-8b17-cd8c5ef1baf0.image.png?v=1688154522358"
       />
     </figure>
 
@@ -100,9 +119,15 @@
 
     <figure>
       <img
-        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ddc44d81-8f3d-4b9b-8507-ceb0f08c58da.image.png?v=1687808935412"
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/069137ae-8a87-43a3-9a0d-c9918ebafa41.image.png?v=1688154544586"
       />
     </figure>
+
+    <p>
+      If we then tie the illumination vector to where the cursor is on the
+      canvas, we can change the way the terrain gets lit simply by moving the
+      cursor around!
+    </p>
 
     <!-- The footer holds our remix button — you can keep or delete it ✂ -->
     <footer class="footer">

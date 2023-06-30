@@ -1,4 +1,4 @@
-const OUTLINE_STROKE = 1;
+const OUTLINE_STROKE = 0.2;
 const OUTLINE_COLOR = [0,0,0];
 
 // seeded marching squares to find ISO lines
@@ -36,9 +36,8 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
           matchType === 15 ? c[1] : clerp2(OUTLINE_STROKE, c[1], OUTLINE_COLOR[1]);
         newPixels[4 * i + 2] =
           matchType === 15 ? c[2] : clerp2(OUTLINE_STROKE, c[2], OUTLINE_COLOR[2]);
-        newPixels[4 * i + 3] = matchType === 15 ? 0 : 255;
+        newPixels[4 * i + 3] = 255;
       }
-      //   newPixels[4 * i + 3] = matchType === 0 ? 0 : 255;
     }
   }
 

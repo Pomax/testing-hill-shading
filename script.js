@@ -46,7 +46,7 @@ function drawIsoMap() {
   ctx.fillRect(0, 0, w, h);
 
   const SCALE = 10;
-  const lines = [...new Array(10)].map((_, i) => i * 300);
+  const lines = [...new Array(25)].map((_, i) => i * 100);
   isoMap ??= generateMap(png, lines);
 
   const pxl = new ImageData(isoMap, png.width, png.height);
@@ -59,7 +59,7 @@ function drawIsoMap() {
   const oy = 0; // mouseY * SCALE * i ** 0.5;
   ctx.drawImage(cvs, ox, oy, w, h);
 
-  // hillShade(OVERLAY_ONLY);
+  hillShade(OVERLAY_ONLY);
 }
 
 
@@ -104,14 +104,11 @@ function createHillShader() {
 
 // hill shader
 function runHillShade(width, height, pixels, normals, geoTags, mode) {
-  console.log(`running`);
-
   if (mode !== OVERLAY_ONLY) {
     cvs.width = cvs.height = w;
     ctx = cvs.getContext(`2d`);
     ctx.drawImage(bg, 0, 0, w, h);
   }
-  const ctxImage = ctx.getImageData(0, 0, w, h);
 
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
   const light = unit({
