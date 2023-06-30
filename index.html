@@ -153,7 +153,14 @@
     <p>
       If we then add the shaded height map as a 70% transparent overlay,
       (without blurring this time), we can bring out the geographic features and
-      end up with a kick-ass looking 2D map:
+      end up with a kick-ass looking 2D map!
+    </p>
+
+    <p>
+      Although we do need to make sure that we don't shade anything that's
+      perfectly flat, so we do a quick calculation of what value corresponds
+      with "the sun, reflected on a perfectly flat surface" and then we filter
+      out anything with that exact value, to get:
     </p>
 
     <figure>
@@ -163,7 +170,12 @@
     </figure>
 
     <p>
-      And then as final touch, of course, we can bring it back to the animated
+      And done! That's how you turn a height map image into a pretty sweet 2D
+      map!
+    </p>
+
+    <p>
+      ... but as a final touch, of course, we can bring it back to the animated
       graphics all the way at the top: we can tie the sun's vector to the
       position of the cursor on the image, so that we can change the way the
       terrain gets lit simply by moving the cursor around!
