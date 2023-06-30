@@ -13,7 +13,7 @@
     <h1>Let's test some hill shading</h1>
     
     <p>
-      Ever seen a google map with real terrain, instead of blobs?
+      Ever seen a map that changes shading? Move your cursor or tap anywhere in the map below to change the sun's position!
     </p>
 
     <canvas id="cvs"></canvas>
@@ -71,14 +71,13 @@
     </figure>
 
     <p>
-      And then we can recolour every pixel based on that value, with a frankly
-      ridiculous amount of freedom in terms of what that means, so the above
-      image uses a two-pass approach, where we take the underlying map:
+      We can also take our height map and, using the <a href="">Marching Squares</a> algorith, find all regions that have the same elevation (bracketed to 100 foot bands):
     </p>
+    
 
     <figure>
       <img
-        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/bgmap.png?v=1687793329687"
+        src="https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/1ae33f7f-1734-4858-8389-c431a1371c9e.image.png?v=1688153884945"
       />
     </figure>
 

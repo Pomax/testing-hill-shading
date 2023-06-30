@@ -32,18 +32,21 @@ const cvs = document.getElementById(`cvs`);
 cvs.width = cvs.height = w;
 let ctx = cvs.getContext(`2d`);
 
-let mouseX = 0;
-let mouseY = 0;
+let mouseX = -0.5;
+let mouseY = -0.5;
 cvs.addEventListener(`mousemove`, (evt) => {
   mouseX = (evt.offsetX - w / 2) / w;
   mouseY = (evt.offsetY - h / 2) / h;
+  drawIsoMap();
+});
 
+function drawIsoMap() {
   ctx.globalAlpha = 1;
   ctx.fillStyle = `#0FE`;
   ctx.fillRect(0, 0, w, h);
 
   const SCALE = 10;
-  const lines = [...new Array(25)].map((_, i) => i * 100);
+  const lines = [...new Array(10)].map((_, i) => i * 300);
   isoMap ??= generateMap(png, lines);
 
   const pxl = new ImageData(isoMap, png.width, png.height);
@@ -56,10 +59,9 @@ cvs.addEventListener(`mousemove`, (evt) => {
   const oy = 0; // mouseY * SCALE * i ** 0.5;
   ctx.drawImage(cvs, ox, oy, w, h);
 
-  hillShade(OVERLAY_ONLY);
-});
+  // hillShade(OVERLAY_ONLY);
+}
 
-cvs.addEventListener(`mouseout`, (evt) => hillShade());
 
 fetch(SOURCE)
   .then((r) => r.arrayBuffer())
@@ -69,7 +71,7 @@ fetch(SOURCE)
     bg.onload = () => {
       png = readPNG(SOURCE, data);
       hillShade = createHillShader();
-      hillShade();
+      drawIsoMap();
     };
   });
 
@@ -112,7 +114,11 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
   const ctxImage = ctx.getImageData(0, 0, w, h);
 
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
-  const light = unit({ x: -300, y: -300, z: 10 });
+  const light = unit({
+    x: mouseX * w * 2,
+    y: mouseY * h * 2,
+    z: 10,
+  });
 
   // illuminate
   const drawPixels = false;

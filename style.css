@@ -200,4 +200,5 @@ figure img {
 
 canvas {
   max-height: 80vh;
+  border: 1px solid black;
 }
