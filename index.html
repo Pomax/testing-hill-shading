@@ -43,19 +43,37 @@
     </figure>
 
     <p>
-      We can compute the "surface normal" for each pixel, i.e. the vector that
-      tells us the 3D angle of the surface at that pixel, by looking at each
-      pixel's four direct neighbours. This is surprisingly simple: we just
-      create a vector <code>{x: a-b, y: c-d, z: 2}</code> where "a" and "b" are
-      the heights for the pixels at (x-1,y) and (x+1,y) respectively, and "c"
-      and "d" are the heights for the pixels at (x,y-1) and (x,y+1),
-      respectively.
+      Every pixel in this image isn't a "colour" so much as a height value,
+      where white pixels are "pretty heigh up!" and black pixels are effectively
+      sea level (or, technically maybe even a little lower than that!)
+    </p>
+
+    <p>
+      In order to turn this, frankly, not very useful information into a good
+      looking 2D map, we can turn the height map into something that (to a
+      computer at least) looks like a 3D surface, so we can shine some light on
+      it and get something that looks, you know, like actual terrain.
+    </p>
+
+    <p></p>
+
+    <p>
+      The standard way to do this is to compute the
+      <a href="https://en.wikipedia.org/wiki/Normal_(geometry)"
+        >surface normal</a
+      >
+      for each pixel, i.e. the vector that tells us the 3D angle of the surface
+      at that pixel, by looking at each pixel's four direct neighbours. This is
+      surprisingly simple: we just create a vector
+      <code>{x: a-b, y: c-d, z: 2}</code> where "a" and "b" are the heights for
+      the pixels at (x-1,y) and (x+1,y) respectively, and "c" and "d" are the
+      heights for the pixels at (x,y-1) and (x,y+1), respectively.
     </p>
     <p>
       If we then normalize that vector (i.e. scale it such that it has a total
-      length of 1) and render as RGB vector (so, pretending that "x" represents
-      the pixel's amount of red, "y" the amount of green, and "z" the amount of
-      blue) then we get:
+      length of 1) and render it as an RGB vector (so, pretending that "x"
+      represents the pixel red value, "y" the green value, and "z" the blue
+      value) then we get this:
     </p>
 
     <figure>
@@ -66,12 +84,12 @@
 
     <p>
       We can then compute how much light would get reflected "up" into the
-      screen, given the sun at some specific position. If we also model that
-      position using an x/y/z vector then we can use the standard
+      screen, given the sun at some specific position: we can use the standard
       <a href="https://en.wikipedia.org/wiki/Reflection_(mathematics)"
         >vector reflection</a
       >
-      approach to yield something pretty funky:
+      approach to have a "ray of sunlight" bounce off of our pixel's surface,
+      giving us a neatly illuminated terrain view:
     </p>
 
     <figure>
@@ -180,10 +198,8 @@
       position of the cursor on the image, so that we can change the way the
       terrain gets lit simply by moving the cursor around!
     </p>
-    
-    <p>
-      — <a href="https://mastodon.social/@TheRealPomax">Pomax</a>
-    </p>
+
+    <p>— <a href="https://mastodon.social/@TheRealPomax">Pomax</a></p>
 
     <!-- The footer holds our remix button — you can keep or delete it ✂ -->
     <footer class="footer">

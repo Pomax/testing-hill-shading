@@ -92,6 +92,9 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
     ctx.drawImage(bg, 0, 0, w, h);
   }
 
+  // First off, we need a light source, which is really just "a vector" that we can 
+  // reflect over our normals to determine how much light will end up going straight
+  // up, because that's the only thing we really care about here:
   const F = (v) => constrainMap(v, 0, 1, 0, 255);
   const light = unit({
     x: mouseX * w * 2,
@@ -99,6 +102,8 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
     z: 10,
   });
 
+  // We also want to know what RGB value corresponds to a perfectly flat surface, so
+  // that we can "ignore" those later on (by rendering them as 100% transparent).
   const flat = unit(reflect(light, {x:0, y:0, z:1}));
   const flatValue = constrainMap(flat.z ** 0.1, 0, 1, 0, 255);
   
