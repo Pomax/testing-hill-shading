@@ -35,7 +35,7 @@ function addISOLayer(pixels, newPixels, width, height, threshold) {
         (se > threshold ? 2 : 0) +
         (sw > threshold ? 1 : 0);
 
-      if (matchType !== 0) {
+      if (matchType > 0) {
         newPixels[4 * i] =
           matchType === 15
             ? c[0]

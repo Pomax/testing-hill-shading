@@ -21,8 +21,8 @@ let png;
 let isoMap;
 let hillShade = () => {};
 
-const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
-const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
+const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W125_DSM.120m.png?v=1688177542690`;
+const BGSOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W125_DSM.120m.png?v=1688177542690`;
 const bg = new Image();
 
 // Let's set up the main canvas using nicely big dimensions
@@ -189,7 +189,17 @@ function drawIsoMap() {
   const lines = [...new Array(25)].map((_, i) => i * 100);
   isoMap ??= generateMap(png, lines);
 
+  // get iso pixels, and make all perfectly flat pixels transparent
   const pxl = new ImageData(isoMap, png.width, png.height);
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) {
+      const i = x + y * w;
+      const n = normals[i];
+      if (n.x === 0 && n.y === 0 ) {
+        pxl[4*i + 3] = 0;
+      }
+    }
+  }
   const cvs = document.createElement(`canvas`);
   cvs.width = pxl.width;
   cvs.height = pxl.height;
