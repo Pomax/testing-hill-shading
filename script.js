@@ -19,6 +19,7 @@ const OVERLAY_ONLY = Symbol();
 
 let png;
 let isoMap;
+let normals;
 let hillShade = () => {};
 
 const SOURCE = `https://cdn.glitch.global/6f093c76-7f96-4f52-94dd-2b1647bfb115/ALPSMLC30_N048W125_DSM.120m.png?v=1688177542690`;
@@ -63,7 +64,7 @@ function createHillShader() {
   };
 
   // Build normals
-  const normals = [];
+  normals = [];
   const elevation = { min: 0, max: 0 };
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
@@ -191,15 +192,9 @@ function drawIsoMap() {
 
   // get iso pixels, and make all perfectly flat pixels transparent
   const pxl = new ImageData(isoMap, png.width, png.height);
-  for (let x = 0; x < w; x++) {
-    for (let y = 0; y < h; y++) {
-      const i = x + y * w;
-      const n = normals[i];
-      if (n.x === 0 && n.y === 0 ) {
-        pxl[4*i + 3] = 0;
-      }
-    }
-  }
+  
+  // TODO: make sure that we treat "perfectly flat surfaces" as water,
+  // because ground isn't perfectly flat, but lakes etc. sure are!
   const cvs = document.createElement(`canvas`);
   cvs.width = pxl.width;
   cvs.height = pxl.height;
