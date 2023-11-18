@@ -138,10 +138,12 @@ function runHillShade(width, height, pixels, normals, geoTags, mode) {
         shaded.data[i + 0] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 1] = constrainMap(p, -500, 9000, 0, 255) | 0;
         shaded.data[i + 2] = constrainMap(p, -500, 9000, 0, 255) | 0;
+        shaded.data[i + 3] = e === flatValue ? 0 : 255;
       } else {
         shaded.data[i + 0] = F(n.x) | 0;
         shaded.data[i + 1] = F(n.y) | 0;
         shaded.data[i + 2] = F(n.z) | 0;
+        shaded.data[i + 3] = e === flatValue ? 0 : 255;
       }
 
       // But if we're NOT debugging, draw our terrain pixel, now that
