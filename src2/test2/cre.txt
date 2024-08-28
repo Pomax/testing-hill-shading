@@ -1,0 +1,23 @@
+- learn how ECR works?
+  - how to get a container into ECR
+  - how to get *our* container into ECR using our build process
+    - terraform scripts/work
+
+  - how to then install from ECR
+
+- Glitch repo has ECR branches to look at
+- expectation = you have to set up replication needs to exist before the repo can be run. don't think we can do that after the fact.
+
+-----
+
+eng. meeting
+
+1. move sequelize to post-ECR work, rewrite as epic?
+2. ECR
+   - 
+
+- placeProject (project pacement service ts)
+  - subrole is "split" or default (xenial?)
+  - actual container gets built by swarm-forwarder (little proxy) by being told to do so by BigProxy
+    - which docker container to send to, or which container image to build
+    - right now, one docker host only knows one docker image
