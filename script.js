@@ -1,5 +1,5 @@
-const SOURCE = `.glitch-assets/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
-const BGSOURCE = `.glitch-assets/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
+const SOURCE = `glitch-assets/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
+const BGSOURCE = `glitch-assets/ALPSMLC30_N048W124_DSM.120m.png?v=1688152031668`;
 
 // =====================================================
 
